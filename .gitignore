@@ -6,6 +6,7 @@ Bulid
 
 .vscode
 .vs
+.idea
 *.VC.db
 *.opensdf
 *.opendb
