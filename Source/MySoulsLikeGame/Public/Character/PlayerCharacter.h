@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/MyCharacterBase.h"
+#include "Character/SLCharacterBase.h"
 #include "PlayerCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYSOULSLIKEGAME_API APlayerCharacter : public AMyCharacterBase
+class MYSOULSLIKEGAME_API APlayerCharacter : public ASLCharacterBase
 {
 	GENERATED_BODY()
 	
