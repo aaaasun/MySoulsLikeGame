@@ -13,5 +13,7 @@ UCLASS()
 class MYSOULSLIKEGAME_API AEnemyCharacter : public ASLCharacterBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	AEnemyCharacter();
 };

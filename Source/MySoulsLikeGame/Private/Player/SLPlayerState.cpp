@@ -1,15 +1,21 @@
 // copyright asun
 
 
-#include "Character/EnemyCharacter.h"
-
+#include "Player/SLPlayerState.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "AbilitySystem/SLAttributeSet.h"
 
-AEnemyCharacter::AEnemyCharacter()
+ASLPlayerState::ASLPlayerState()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<USLAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 
 	AttributeSet=CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
+
+	NetUpdateFrequency = 100.f;
+}
+
+UAbilitySystemComponent* ASLPlayerState::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }

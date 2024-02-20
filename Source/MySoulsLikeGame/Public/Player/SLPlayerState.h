@@ -4,28 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "GameFramework/Character.h"
-#include "SLCharacterBase.generated.h"
+#include "GameFramework/PlayerState.h"
+#include "SLPlayerState.generated.h"
 
-class UAttributeSet;
 class UAbilitySystemComponent;
-
-UCLASS(Abstract)
-class MYSOULSLIKEGAME_API ASLCharacterBase : public ACharacter, public IAbilitySystemInterface
+class UAttributeSet;
+/**
+ * 
+ */
+UCLASS()
+class MYSOULSLIKEGAME_API ASLPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
-	ASLCharacterBase();
+	ASLPlayerState();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 protected:
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> Weapon;
-
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
