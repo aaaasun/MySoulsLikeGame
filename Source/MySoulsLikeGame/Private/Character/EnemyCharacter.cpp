@@ -10,6 +10,14 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<USLAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
-	AttributeSet=CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
+	AttributeSet = CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
+}
+
+void AEnemyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }

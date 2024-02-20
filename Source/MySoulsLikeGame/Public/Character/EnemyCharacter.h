@@ -16,4 +16,7 @@ class MYSOULSLIKEGAME_API AEnemyCharacter : public ASLCharacterBase
 
 public:
 	AEnemyCharacter();
+
+protected:
+	virtual void BeginPlay() override;
 };

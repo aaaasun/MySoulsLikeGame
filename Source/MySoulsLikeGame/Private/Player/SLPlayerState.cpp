@@ -9,8 +9,9 @@ ASLPlayerState::ASLPlayerState()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<USLAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	AttributeSet=CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
+	AttributeSet = CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
 
 	NetUpdateFrequency = 100.f;
 }
