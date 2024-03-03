@@ -7,7 +7,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/SLPlayerController.h"
 #include "Player/SLPlayerState.h"
+#include "UI/HUD/SLHUD.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -56,4 +58,12 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = SLPlayerState->GetAbilitySystemComponent();
 	AttributeSet = SLPlayerState->GetAttributeSet();
 	AbilitySystemComponent->InitAbilityActorInfo(SLPlayerState, this);
+	//初始化Overlay
+	if (ASLPlayerController* SLPlayerController = Cast<ASLPlayerController>(GetController()))
+	{
+		if (ASLHUD* SLHUD = Cast<ASLHUD>(SLPlayerController->GetHUD()))
+		{
+			SLHUD->InitOverlay(SLPlayerController, SLPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }

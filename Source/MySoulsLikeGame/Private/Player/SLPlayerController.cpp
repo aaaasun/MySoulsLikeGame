@@ -18,8 +18,10 @@ void ASLPlayerController::BeginPlay()
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(SLContext, 0);
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(SLContext, 0);
+	}
 }
 
 void ASLPlayerController::SetupInputComponent()
