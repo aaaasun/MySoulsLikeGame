@@ -7,13 +7,7 @@
 #include "OverlayWidgetController.generated.h"
 
 struct FOnAttributeChangeData;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float, NewMaxHealth);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStaminaChangedSignature, float, NewStamina);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxStaminaChangedSignature, float, NewMaxStamina);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 /**
  * 
@@ -28,21 +22,14 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnHealthChangedSignature OnHealthChanged;
+	FOnAttributeChangedSignature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnMaxHealthChangedSignature OnMaxHealthChanged;
+	FOnAttributeChangedSignature OnMaxHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnStaminaChangedSignature OnStaminaChanged;
+	FOnAttributeChangedSignature OnStaminaChanged;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnMaxStaminaChangedSignature OnMaxStaminaChanged;
-
-protected:
-	//FOnAttributeChangeData是属性更改时使用的临时参数结构
-	void HealthChanged(const FOnAttributeChangeData& Data) const;
-	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
-	void StaminaChanged(const FOnAttributeChangeData& Data) const;
-	void MaxStaminaChanged(const FOnAttributeChangeData& Data) const;
+	FOnAttributeChangedSignature OnMaxStaminaChanged;
 };

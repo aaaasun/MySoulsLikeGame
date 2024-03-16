@@ -66,4 +66,5 @@ void APlayerCharacter::InitAbilityActorInfo()
 			SLHUD->InitOverlay(SLPlayerController, SLPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	InitializeDefaultAttributes();
 }
