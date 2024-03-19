@@ -32,4 +32,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
 	FOnAttributeChangedSignature OnMaxStaminaChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
+	FOnAttributeChangedSignature OnMentalStrengthChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
+	FOnAttributeChangedSignature OnMaxMentalStrengthChanged;
 };

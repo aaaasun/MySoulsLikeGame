@@ -12,6 +12,8 @@ void UOverlayWidgetController::BroadcastInitialValues()
 	OnMaxHealthChanged.Broadcast(SLAttributeSet->GetMaxHealth());
 	OnStaminaChanged.Broadcast(SLAttributeSet->GetStamina());
 	OnMaxStaminaChanged.Broadcast(SLAttributeSet->GetMaxStamina());
+	OnMentalStrengthChanged.Broadcast(SLAttributeSet->GetMentalStrength());
+	OnMaxMentalStrengthChanged.Broadcast(SLAttributeSet->GetMaxMentalStrength());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
@@ -45,4 +47,20 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnMaxStaminaChanged.Broadcast(Data.NewValue);
 		}
 	);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SLAttributeSet->GetMentalStrengthAttribute()).
+	                        AddLambda(
+		                        [this](const FOnAttributeChangeData& Data)
+		                        {
+			                        OnMentalStrengthChanged.Broadcast(Data.NewValue);
+		                        }
+	                        );
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(SLAttributeSet->GetMaxMentalStrengthAttribute()).
+	                        AddLambda(
+		                        [this](const FOnAttributeChangeData& Data)
+		                        {
+			                        OnMaxMentalStrengthChanged.Broadcast(Data.NewValue);
+		                        }
+	                        );
 }

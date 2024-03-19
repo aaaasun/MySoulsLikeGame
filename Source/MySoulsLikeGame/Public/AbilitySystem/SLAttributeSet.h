@@ -49,6 +49,10 @@ struct FEffectProperties
 	ACharacter* TargetCharacter = nullptr;
 };
 
+//TStaticFuncPtr对于任何静态函数指针签名都是通用的
+template <class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -65,6 +69,8 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 	/**
 	* Primary Attributes
@@ -93,7 +99,7 @@ public:
 
 	/**
 	 * Secondary Attributes
-	 * 最大血量、最大体力、最大心力、防御力、体力恢复
+	 * 最大血量、最大体力、最大心力、攻击力、防御力、体力恢复
 	 */
 	//最大血量(活力影响
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxHealth, Category="Secondary Attributes")

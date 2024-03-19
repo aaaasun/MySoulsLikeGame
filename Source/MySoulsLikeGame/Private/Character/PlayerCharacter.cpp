@@ -4,6 +4,7 @@
 #include "Character/PlayerCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -58,6 +59,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = SLPlayerState->GetAbilitySystemComponent();
 	AttributeSet = SLPlayerState->GetAttributeSet();
 	AbilitySystemComponent->InitAbilityActorInfo(SLPlayerState, this);
+	Cast<USLAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	//初始化Overlay
 	if (ASLPlayerController* SLPlayerController = Cast<ASLPlayerController>(GetController()))
 	{
