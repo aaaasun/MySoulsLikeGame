@@ -2,8 +2,13 @@
 
 
 #include "Player/SLPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "SLGameplayTags.h"
+#include "AbilitySystem/SLAbilitySystemComponent.h"
+#include "Input/SLInputComponent.h"
 
 ASLPlayerController::ASLPlayerController()
 {
@@ -24,13 +29,52 @@ void ASLPlayerController::BeginPlay()
 	}
 }
 
+void ASLPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
+	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
+}
+
+void ASLPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+}
+
+void ASLPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
+	if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+}
+
+USLAbilitySystemComponent* ASLPlayerController::GetASC()
+{
+	if (SLAbilitySystemComponent == nullptr)
+	{
+		SLAbilitySystemComponent = Cast<USLAbilitySystemComponent>(
+			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return SLAbilitySystemComponent;
+}
+
 void ASLPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASLPlayerController::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASLPlayerController::Look);
+	USLInputComponent* SLInputComponent = CastChecked<USLInputComponent>(InputComponent);
+	SLInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASLPlayerController::Move);
+	SLInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASLPlayerController::Look);
+	SLInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed,
+	                                     &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void ASLPlayerController::Move(const FInputActionValue& InputActionValue)

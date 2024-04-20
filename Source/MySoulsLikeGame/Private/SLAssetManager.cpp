@@ -2,6 +2,8 @@
 
 
 #include "SLAssetManager.h"
+
+#include "AbilitySystemGlobals.h"
 #include "SLGameplayTags.h"
 
 USLAssetManager& USLAssetManager::Get()
@@ -17,4 +19,6 @@ void USLAssetManager::StartInitialLoading()
 	Super::StartInitialLoading();
 
 	FSLGameplayTags::InitializeNativeGameplayTags();
+	//要使用TargetData这里必须要加
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

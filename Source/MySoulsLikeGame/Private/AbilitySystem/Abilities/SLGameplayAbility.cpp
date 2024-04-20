@@ -3,3 +3,6 @@
 
 #include "AbilitySystem/Abilities/SLGameplayAbility.h"
 
+USLGameplayAbility::USLGameplayAbility()
+{
+}

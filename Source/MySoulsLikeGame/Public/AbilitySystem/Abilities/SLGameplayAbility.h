@@ -13,5 +13,14 @@ UCLASS()
 class MYSOULSLIKEGAME_API USLGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
-	
+
+public:
+	USLGameplayAbility();
+
+	//启用输入标签，用于在开始赋予角色标签时做检查
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	FGameplayTag StartupInputTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Damage")
+	FScalableFloat Damage;
 };

@@ -144,6 +144,13 @@ public:
 	FGameplayAttributeData MentalStrength;
 	ATTRIBUTE_ACCESSORS(USLAttributeSet, MentalStrength);
 
+	/**
+	 * Meta Attributes
+	 * 传入伤害
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(USLAttributeSet, IncomingDamage);
 
 	UFUNCTION()
 	void OnRep_Vigor(const FGameplayAttributeData& OldVigor) const;

@@ -17,13 +17,12 @@ public:
 	static const FSLGameplayTags& Get() { return GameplayTags; }
 	static void InitializeNativeGameplayTags();
 
-	//Primary Attributes
 	FGameplayTag Attributes_Primary_Vigor;
 	FGameplayTag Attributes_Primary_Energy;
 	FGameplayTag Attributes_Primary_Strength;
 	FGameplayTag Attributes_Primary_Endurance;
 	FGameplayTag Attributes_Primary_Luck;
-	//Secondary Attributes
+
 	FGameplayTag Attributes_Secondary_MaxHealth;
 	FGameplayTag Attributes_Secondary_MaxStamina;
 	FGameplayTag Attributes_Secondary_MaxMentalStrength;
@@ -31,7 +30,18 @@ public:
 	FGameplayTag Attributes_Secondary_Defense;
 	FGameplayTag Attributes_Secondary_StaminaRegeneration;
 
-protected:
+	FGameplayTag Input_LMB;
+	FGameplayTag Input_RMB;
+	FGameplayTag Input_1;
+	FGameplayTag Input_Alt;
+
+	FGameplayTag Damage;
+
+	FGameplayTag Effect_HitReact;
+
+	FGameplayTag Player_Block_InputPressed;
+	FGameplayTag Player_Block_InputHeld;
+	FGameplayTag Player_Block_InputReleased;
 
 private:
 	static FSLGameplayTags GameplayTags;

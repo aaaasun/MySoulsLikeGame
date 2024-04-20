@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "SLPlayerController.generated.h"
 
+class USLAbilitySystemComponent;
+class USLInputConfig;
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
@@ -34,8 +37,20 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> LookAction;
-	
+
 	void Move(const FInputActionValue& InputActionValue);
 
 	void Look(const FInputActionValue& InputActionValue);
+
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<USLInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<USLAbilitySystemComponent> SLAbilitySystemComponent;
+
+	USLAbilitySystemComponent* GetASC();
 };

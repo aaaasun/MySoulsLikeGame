@@ -1,0 +1,26 @@
+// copyright aaaasun
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AbilitySystem/Abilities/SLGameplayAbility.h"
+#include "SLMeleeAbility.generated.h"
+
+class UGameplayEffect;
+
+/**
+ * 
+ */
+UCLASS()
+class MYSOULSLIKEGAME_API USLMeleeAbility : public USLGameplayAbility
+{
+	GENERATED_BODY()
+
+public:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	                             const FGameplayAbilityActivationInfo ActivationInfo,
+	                             const FGameplayEventData* TriggerEventData) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+};
