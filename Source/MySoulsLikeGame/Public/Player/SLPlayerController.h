@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "SLPlayerController.generated.h"
 
+class UDamageTextComponent;
 class USLAbilitySystemComponent;
 class USLInputConfig;
 struct FInputActionValue;
@@ -23,6 +24,9 @@ class MYSOULSLIKEGAME_API ASLPlayerController : public APlayerController
 
 public:
 	ASLPlayerController();
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bCritical);
 
 protected:
 	virtual void BeginPlay() override;
@@ -53,4 +57,7 @@ private:
 	TObjectPtr<USLAbilitySystemComponent> SLAbilitySystemComponent;
 
 	USLAbilitySystemComponent* GetASC();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };

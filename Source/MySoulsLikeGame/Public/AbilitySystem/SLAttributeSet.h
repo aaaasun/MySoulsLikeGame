@@ -127,6 +127,19 @@ public:
 	ATTRIBUTE_ACCESSORS(USLAttributeSet, StaminaRegeneration);
 
 	/**
+	* Resistance Attributes
+	* 物理抵抗、火焰抵抗
+	*/
+	//物理抵抗
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalResistance, Category="Resistance Attributes")
+	FGameplayAttributeData PhysicalResistance;
+	ATTRIBUTE_ACCESSORS(USLAttributeSet, PhysicalResistance);
+	//火焰抵抗
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_FireResistance, Category="Resistance Attributes")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(USLAttributeSet, FireResistance);
+
+	/**
 	 * Vital Attributes
 	 * 血量、体力、心力
 	 */
@@ -194,6 +207,14 @@ public:
 	UFUNCTION()
 	void OnRep_MaxMentalStrength(const FGameplayAttributeData& OldMaxMentalStrength) const;
 
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
+
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+
 private:
-	static void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+
+	void ShowFloatingText(const FEffectProperties& Props, float Damage, bool bCriticalHit) const;
 };

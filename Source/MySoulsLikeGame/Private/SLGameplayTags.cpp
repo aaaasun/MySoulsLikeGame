@@ -68,6 +68,34 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Damage"), FString("伤害"));
 
+	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Physical"), FString("物理伤害类型"));
+
+	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Fire"), FString("火焰伤害类型"));
+
+	/**
+	 *Resistances
+	*/
+	GameplayTags.Attributes_Resistance_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Resistance.Physical"), FString("物理伤害抵抗"));
+
+	GameplayTags.Attributes_Resistance_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Resistance.Fire"), FString("火焰伤害抵抗"));
+
+	/**
+	 *Map of Damage Types to Resistances
+	*/
+	GameplayTags.DamageTypesToResistances.Add(
+		GameplayTags.Damage_Physical,
+		GameplayTags.Attributes_Resistance_Physical
+	);
+
+	GameplayTags.DamageTypesToResistances.Add(
+		GameplayTags.Damage_Fire,
+		GameplayTags.Attributes_Resistance_Fire
+	);
+
 	/**
 	 *Effect
 	*/

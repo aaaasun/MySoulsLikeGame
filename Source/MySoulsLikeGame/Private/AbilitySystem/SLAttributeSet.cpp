@@ -7,7 +7,11 @@
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "SLGameplayTags.h"
+#include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/SLPlayerController.h"
 
 USLAttributeSet::USLAttributeSet()
 {
@@ -24,6 +28,9 @@ USLAttributeSet::USLAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_AttackPower, GetAttackPowerAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_Defense, GetDefenseAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_StaminaRegeneration, GetStaminaRegenerationAttribute);
+
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Physical, GetPhysicalResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Fire, GetFireResistanceAttribute);
 }
 
 //类必须有这个函数，以注册用于复制的变量
@@ -44,6 +51,9 @@ void USLAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, AttackPower, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, Defense, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, StaminaRegeneration, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, PhysicalResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, FireResistance, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(USLAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
@@ -69,7 +79,7 @@ void USLAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 	}
 }
 
-void USLAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
+void USLAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
 {
 	//Source=Effect的造成者，Target=Effect的目标（AttributeSet的owner）
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
@@ -90,7 +100,7 @@ void USLAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& 
 		}
 		if (Props.SourceController)
 		{
-			Props.SourceCharacter = Cast<ACharacter>(Props.SourceAvatarActor);
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
 	//获取Target的数据并存起来
@@ -133,6 +143,34 @@ void USLAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 			const bool bFatal = NewHealth <= 0.f;
+			if (bFatal)
+			{
+				ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor);
+				if (CombatInterface)
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FSLGameplayTags::Get().Effect_HitReact);
+				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+			//显示伤害数值
+			const bool bCritical = USLAbilitySystemBlueprintLibrary::IsCriticalHit(Props.EffectContextHandle);
+			ShowFloatingText(Props, LocalIncomingDamage, bCritical);
+		}
+	}
+}
+
+void USLAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bCriticalHit) const
+{
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if (ASLPlayerController* PC = Cast<ASLPlayerController>(Props.SourceCharacter->Controller))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bCriticalHit);
 		}
 	}
 }
@@ -206,4 +244,14 @@ void USLAttributeSet::OnRep_MentalStrength(const FGameplayAttributeData& OldMent
 void USLAttributeSet::OnRep_MaxMentalStrength(const FGameplayAttributeData& OldMaxMentalStrength) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(USLAttributeSet, MaxMentalStrength, OldMaxMentalStrength);
+}
+
+void USLAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USLAttributeSet, PhysicalResistance, OldPhysicalResistance);
+}
+
+void USLAttributeSet::OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(USLAttributeSet, FireResistance, OldFireResistance);
 }

@@ -8,11 +8,27 @@
 #include "EnhancedInputComponent.h"
 #include "SLGameplayTags.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
+#include "GameFramework/Character.h"
 #include "Input/SLInputComponent.h"
+#include "UI/Widgets/DamageTextComponent.h"
 
 ASLPlayerController::ASLPlayerController()
 {
 	bReplicates = true;
+}
+
+void ASLPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter,
+                                                          bool bCritical)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(),
+		                              FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount, bCritical);
+	}
 }
 
 void ASLPlayerController::BeginPlay()

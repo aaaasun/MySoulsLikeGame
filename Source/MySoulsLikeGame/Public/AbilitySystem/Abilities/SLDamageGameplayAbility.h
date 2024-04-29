@@ -1,0 +1,23 @@
+// copyright aaaasun
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AbilitySystem/Abilities/SLGameplayAbility.h"
+#include "SLDamageGameplayAbility.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class MYSOULSLIKEGAME_API USLDamageGameplayAbility : public USLGameplayAbility
+{
+	GENERATED_BODY()
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+};

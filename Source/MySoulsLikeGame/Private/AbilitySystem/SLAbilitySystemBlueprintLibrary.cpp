@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "SLAbilityTypes.h"
 #include "Game/SLGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/SLPlayerState.h"
@@ -73,4 +74,36 @@ void USLAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(const UObject
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(
 		CharacterClassInfo->VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+}
+
+void USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject,
+                                                            UAbilitySystemComponent* ASC)
+{
+	const ASLGameModeBase* SLGameMode = Cast<ASLGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (SLGameMode == nullptr) return;
+
+	UCharacterClassInfo* CharacterClassInfo = SLGameMode->CharacterClassInfo;
+	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+}
+
+bool USLAbilitySystemBlueprintLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FSLGameplayEffectContext* SLEffectContext = static_cast<const FSLGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return SLEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void USLAbilitySystemBlueprintLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle,
+                                                        bool bInIsCriticalHit)
+{
+	if (FSLGameplayEffectContext* SLEffectContext = static_cast<FSLGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		SLEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
 }

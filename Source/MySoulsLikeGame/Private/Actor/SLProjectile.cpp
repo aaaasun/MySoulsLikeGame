@@ -21,9 +21,9 @@ ASLProjectile::ASLProjectile()
 	Box->SetCollisionObjectType(ECC_Projectile);
 	Box->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Box->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Box->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	Box->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-	Box->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Box->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	Box->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	Box->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovement->ProjectileGravityScale = 0.98f;
@@ -35,7 +35,7 @@ void ASLProjectile::BeginPlay()
 	Super::BeginPlay();
 
 	SetLifeSpan(LifeSpan);
-	Box->OnComponentBeginOverlap.AddDynamic(this, &ASLProjectile::OnBoxOverlap);
+	Box->OnComponentHit.AddDynamic(this, &ASLProjectile::OnHit);
 	LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
 }
 
@@ -43,20 +43,31 @@ void ASLProjectile::Destroyed()
 {
 	if (!bHit && !HasAuthority())
 	{
-		LoopingSoundComponent->Stop();
+		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
 	}
 	Super::Destroyed();
 }
 
-void ASLProjectile::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                 const FHitResult& SweepResult)
+void ASLProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                          FVector NormalImpulse, const FHitResult& Hit)
 {
-	LoopingSoundComponent->Stop();
+	if (DamageEffectSpecHandle.Data.IsValid() &&
+		DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+	if (!bHit)
+	{
+		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+	}
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
+			FGameplayEffectContextHandle EffectContextHandle = DamageEffectSpecHandle.Data.Get()->GetContext();
+			FGameplayEffectContext* EffectContext = EffectContextHandle.Get();
+			EffectContext->AddHitResult(Hit);
+
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
 		Destroyed();
@@ -66,3 +77,11 @@ void ASLProjectile::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		bHit = true;
 	}
 }
+
+/*
+void ASLProjectile::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                 const FHitResult& SweepResult)
+{
+}
+*/

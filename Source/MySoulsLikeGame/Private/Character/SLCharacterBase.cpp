@@ -5,9 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 
 ASLCharacterBase::ASLCharacterBase()
 {
@@ -26,14 +24,41 @@ ASLCharacterBase::ASLCharacterBase()
 	Bow->SetupAttachment(GetMesh(), FName("BowSocket"));
 	Bow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	BowArrow = CreateDefaultSubobject<USkeletalMeshComponent>("BowArrow");
-	BowArrow->SetupAttachment(GetMesh(), FName("BowArrowSocket"));
-	BowArrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ArrowPouch = CreateDefaultSubobject<USkeletalMeshComponent>("ArrowPouch");
+	ArrowPouch->SetupAttachment(GetMesh(), FName("BowArrowSocket"));
+	ArrowPouch->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 UAbilitySystemComponent* ASLCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UAnimMontage* ASLCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
+
+void ASLCharacterBase::Die()
+{
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	Bow->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	MulticastHandleDeath();
+}
+
+void ASLCharacterBase::MulticastHandleDeath_Implementation()
+{
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Bow->SetSimulatePhysics(true);
+	Bow->SetEnableGravity(true);
+	Bow->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ASLCharacterBase::BeginPlay()

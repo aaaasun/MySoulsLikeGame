@@ -42,7 +42,7 @@ void UHitResultTargetData::SendUnderCrosshairsData()
 
 	FHitResult CrosshairsHit;
 	TraceUnderCrosshairs(8000.f, CrosshairsHit);
-
+	
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
 	Data->HitResult = CrosshairsHit;

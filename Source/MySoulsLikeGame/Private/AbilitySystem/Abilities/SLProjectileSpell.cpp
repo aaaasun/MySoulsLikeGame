@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "SLGameplayTags.h"
 #include "Actor/SLProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -44,8 +45,28 @@ void USLProjectileSpell::SpawnProjectile(const FVector& TraceHitTarget)
 		//给飞行物添加GESpec来造成伤害
 		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
 			GetAvatarActorFromActorInfo());
+
+		FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+		//设置好EffectContext的属性
+		EffectContextHandle.SetAbility(this); //设置AbilityCDO、AbilityLevel和AbilityInstanceNotReplicated
+		EffectContextHandle.AddSourceObject(Projectile); //设置SourceObject
+		TArray<TWeakObjectPtr<AActor>> Actors;
+		Actors.Add(Projectile);
+		EffectContextHandle.AddActors(Actors); //设置Actors
+		//HitResult我在Projectile OnHit时设置
+
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(
-			DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+			DamageEffectClass,
+			GetAbilityLevel(),
+			EffectContextHandle);
+		FSLGameplayTags GameplayTags = FSLGameplayTags::Get();
+
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage);
+		}
+
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		//step2

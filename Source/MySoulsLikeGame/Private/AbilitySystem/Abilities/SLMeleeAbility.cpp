@@ -14,15 +14,4 @@ void USLMeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                       const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	// const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
-	// if (!bIsServer) return;
-	//
-	// const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
-	// 	GetAvatarActorFromActorInfo());
-	// const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(),
-	//                                                                          SourceASC->MakeEffectContext());
-	// const FSLGameplayTags GameplayTags = FSLGameplayTags::Get();
-	// const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-	// UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
 }
