@@ -97,6 +97,27 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	);
 
 	/**
+	 *Abilities
+	*/
+	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Attack"), FString("攻击"));
+
+	/**
+	 *Montgae
+	*/
+	GameplayTags.Montage_Attack_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.Weapon"), FString("使用武器攻击"));
+
+	GameplayTags.Montage_Attack_Bow = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.Bow"), FString("使用弓箭攻击"));
+
+	GameplayTags.Montage_Attack_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.RightHand"), FString("使用右手攻击"));
+
+	GameplayTags.Montage_Attack_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.LeftHand"), FString("使用左手攻击"));
+	
+	/**
 	 *Effect
 	*/
 	GameplayTags.Effect_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(

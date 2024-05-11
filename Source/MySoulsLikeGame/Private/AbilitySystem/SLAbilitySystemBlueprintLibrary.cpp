@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "SLAbilityTypes.h"
 #include "Game/SLGameModeBase.h"
+#include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/SLPlayerState.h"
 #include "UI/HUD/SLHUD.h"
@@ -77,22 +78,38 @@ void USLAbilitySystemBlueprintLibrary::InitializeDefaultAttributes(const UObject
 }
 
 void USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(const UObject* WorldContextObject,
-                                                            UAbilitySystemComponent* ASC)
+                                                            UAbilitySystemComponent* ASC,
+                                                            ECharacterClass CharacterClass)
 {
-	const ASLGameModeBase* SLGameMode = Cast<ASLGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (SLGameMode == nullptr) return;
-
-	UCharacterClassInfo* CharacterClassInfo = SLGameMode->CharacterClassInfo;
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (CharacterClassInfo == nullptr) return;
 	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		ASC->GiveAbility(AbilitySpec);
 	}
+	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
+	{
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, CombatInterface->GetPlayerLevel());
+			ASC->GiveAbility(AbilitySpec);
+		}
+	}
+}
+
+UCharacterClassInfo* USLAbilitySystemBlueprintLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	const ASLGameModeBase* SLGameMode = Cast<ASLGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (SLGameMode == nullptr) return nullptr;
+	return SLGameMode->CharacterClassInfo;
 }
 
 bool USLAbilitySystemBlueprintLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {
-	if (const FSLGameplayEffectContext* SLEffectContext = static_cast<const FSLGameplayEffectContext*>(EffectContextHandle.Get()))
+	if (const FSLGameplayEffectContext* SLEffectContext = static_cast<const FSLGameplayEffectContext*>(
+		EffectContextHandle.Get()))
 	{
 		return SLEffectContext->IsCriticalHit();
 	}
@@ -106,4 +123,41 @@ void USLAbilitySystemBlueprintLibrary::SetIsCriticalHit(FGameplayEffectContextHa
 	{
 		SLEffectContext->SetIsCriticalHit(bInIsCriticalHit);
 	}
+}
+
+void USLAbilitySystemBlueprintLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject,
+                                                                  TArray<AActor*>& OutOverlappingActors,
+                                                                  const TArray<AActor*>& ActorsToIgnore,
+                                                                  float Radius,
+                                                                  const FVector& SphereOrigin)
+{
+	//参考内置的UGameplayStatics::ApplyRadialDamageWithFalloff
+	FCollisionQueryParams SphereParams;
+	SphereParams.AddIgnoredActors(ActorsToIgnore);
+
+	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject,
+	                                                             EGetWorldErrorMode::LogAndReturnNull))
+	{
+		TArray<FOverlapResult> Overlaps;
+		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity,
+		                                FCollisionObjectQueryParams(
+			                                FCollisionObjectQueryParams::InitType::AllDynamicObjects),
+		                                FCollisionShape::MakeSphere(Radius), SphereParams);
+		for (FOverlapResult& Overlap : Overlaps)
+		{
+			if (Overlap.GetActor()->Implements<UCombatInterface>() &&
+				!ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			{
+				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
+			}
+		}
+	}
+}
+
+bool USLAbilitySystemBlueprintLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
+{
+	const bool bBothArePlayers = FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"));
+	const bool bBothAreEnemies = FirstActor->ActorHasTag(FName("Enemy")) && SecondActor->ActorHasTag(FName("Enemy"));
+	const bool bFriends = bBothArePlayers || bBothAreEnemies;
+	return !bFriends;
 }

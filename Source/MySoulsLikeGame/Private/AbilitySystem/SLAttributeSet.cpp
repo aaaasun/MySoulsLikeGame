@@ -123,8 +123,6 @@ void USLAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-		UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s,Health:%f"), *Props.TargetAvatarActor->GetName(),
-		       GetHealth());
 	}
 	if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
@@ -168,8 +166,15 @@ void USLAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Dam
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if (ASLPlayerController* PC = Cast<ASLPlayerController>(Props.SourceCharacter->Controller))
+		if (Props.SourceCharacter)
 		{
+			ASLPlayerController* PC = Cast<ASLPlayerController>(Props.SourceCharacter->Controller);
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bCriticalHit);
+			return;
+		}
+		if (Props.TargetCharacter)
+		{
+			ASLPlayerController* PC = Cast<ASLPlayerController>(Props.TargetCharacter->Controller);
 			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bCriticalHit);
 		}
 	}

@@ -71,6 +71,7 @@ void ASLProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
 		Destroyed();
+		Destroy();
 	}
 	else
 	{

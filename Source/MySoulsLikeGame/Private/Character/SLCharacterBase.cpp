@@ -4,6 +4,7 @@
 #include "Character/SLCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "SLGameplayTags.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -46,6 +47,29 @@ void ASLCharacterBase::Die()
 	MulticastHandleDeath();
 }
 
+FVector ASLCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
+{
+	//基于蒙太奇返回正确的插槽
+	const FSLGameplayTags& GameplayTags = FSLGameplayTags::Get();
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
+	{
+		return Weapon->GetSocketLocation(WeaponTipSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Bow) && IsValid(Bow))
+	{
+		return Bow->GetSocketLocation(BowTipSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
+	{
+		return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
+	{
+		return GetMesh()->GetSocketLocation(LeftHandSocketName);
+	}
+	return FVector();
+}
+
 void ASLCharacterBase::MulticastHandleDeath_Implementation()
 {
 	Weapon->SetSimulatePhysics(true);
@@ -59,6 +83,7 @@ void ASLCharacterBase::MulticastHandleDeath_Implementation()
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	bDead = true;
 }
 
 void ASLCharacterBase::BeginPlay()
@@ -66,10 +91,19 @@ void ASLCharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-FVector ASLCharacterBase::GetCombatSocketLocation()
+bool ASLCharacterBase::IsDead_Implementation() const
 {
-	check(Bow);
-	return Bow->GetSocketLocation(BowHandSocketName);
+	return bDead;
+}
+
+AActor* ASLCharacterBase::GetAvatar_Implementation()
+{
+	return this;
+}
+
+TArray<FTaggedMontage> ASLCharacterBase::GetAttackMontages_Implementation()
+{
+	return AttackMontages;
 }
 
 void ASLCharacterBase::InitAbilityActorInfo()

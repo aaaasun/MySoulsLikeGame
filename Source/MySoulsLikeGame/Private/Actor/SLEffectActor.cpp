@@ -20,6 +20,8 @@ void ASLEffectActor::BeginPlay()
 
 void ASLEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+
 	//UE的全局库函数直接获取ASC
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 
@@ -38,18 +40,24 @@ void ASLEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGamep
 		*EffectSpecHandle.Data.Get());
 
 	//判断Effect是否是Infinite
-	const bool IsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy ==
+	const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy ==
 		EGameplayEffectDurationType::Infinite;
 
 	//如果是Infinite效果且蓝图中设计为是要消除Effect的策略，用一个Map存储使用的EffectHandle和ASC，后续消除Effect
-	if (IsInfinite && InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	if (bIsInfinite && InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
+	}
+	if (bDestroyOnEffectApplication && !bIsInfinite)
+	{
+		Destroy();
 	}
 }
 
 void ASLEffectActor::OnOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
@@ -66,6 +74,8 @@ void ASLEffectActor::OnOverlap(AActor* TargetActor)
 
 void ASLEffectActor::EndOnOverlap(AActor* TargetActor)
 {
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+
 	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 	{
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);

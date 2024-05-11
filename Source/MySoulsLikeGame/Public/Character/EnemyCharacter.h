@@ -5,25 +5,33 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/SLCharacterBase.h"
+#include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "EnemyCharacter.generated.h"
 
 struct FGameplayTag;
 class UWidgetComponent;
+class UBehaviorTree;
+class ASLAIController;
+
 /**
  * 
  */
 UCLASS()
-class MYSOULSLIKEGAME_API AEnemyCharacter : public ASLCharacterBase
+class MYSOULSLIKEGAME_API AEnemyCharacter : public ASLCharacterBase, public IEnemyInterface
 {
 	GENERATED_BODY()
 
 public:
 	AEnemyCharacter();
 
+	virtual void PossessedBy(AController* NewController) override;
+
 	/**Combat Interaction**/
 	virtual int32 GetPlayerLevel() override;
 	virtual void Die() override;
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
 	/**end Combat Interaction**/
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
@@ -43,11 +51,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Combat")
 	bool bHitReacting = false;
 
-	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	float BaseWalkSpeed = 250.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	float LifeSpan = 5.f;
+
+	UPROPERTY(BlueprintReadWrite, Category="Combat")
+	TObjectPtr<AActor> CombatTarget;
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,4 +73,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> AttributeBar;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ASLAIController> SLAIController;
 };

@@ -7,6 +7,9 @@
 #include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "AbilitySystem/SLAttributeSet.h"
+#include "AI/SLAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MySoulsLikeGame/MySoulsLikeGame.h"
@@ -20,10 +23,30 @@ AEnemyCharacter::AEnemyCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
 	AttributeSet = CreateDefaultSubobject<USLAttributeSet>("AttributeSet");
 
 	AttributeBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	AttributeBar->SetupAttachment(GetRootComponent());
+}
+
+void AEnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	//AI只由服务器控制
+	if (!HasAuthority()) return;
+
+	SLAIController = Cast<ASLAIController>(NewController);
+	SLAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	SLAIController->RunBehaviorTree(BehaviorTree);
+	SLAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+	SLAIController->GetBlackboardComponent()->SetValueAsBool(
+		FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 }
 
 int32 AEnemyCharacter::GetPlayerLevel()
@@ -37,17 +60,27 @@ void AEnemyCharacter::Die()
 	Super::Die();
 }
 
+void AEnemyCharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AEnemyCharacter::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
-	if(HasAuthority())
+	if (HasAuthority())
 	{
-		USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
-	
+
 
 	//显示敌人的面板,同OverlayWidgetController,也可以封装到一个类里
 	if (USLUserWidget* SLUserWidget = Cast<USLUserWidget>(AttributeBar->GetUserWidgetObject()))
@@ -103,6 +136,10 @@ void AEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 N
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	if (SLAIController && SLAIController->GetBlackboardComponent())
+	{
+		SLAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
+	}
 }
 
 void AEnemyCharacter::InitAbilityActorInfo()
@@ -110,7 +147,7 @@ void AEnemyCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<USLAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 
-	if(HasAuthority())
+	if (HasAuthority())
 	{
 		InitializeDefaultAttributes();
 	}

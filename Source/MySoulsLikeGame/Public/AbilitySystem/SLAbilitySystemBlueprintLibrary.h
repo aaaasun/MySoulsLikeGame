@@ -26,15 +26,31 @@ public:
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category="SLAbilitySystemLibrary|CharacterClassDefaults")
-	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass,
+	static void InitializeDefaultAttributes(const UObject* WorldContextObject,
+	                                        ECharacterClass CharacterClass,
 	                                        int32 Level, UAbilitySystemComponent* ASC);
 
 	UFUNCTION(BlueprintCallable, Category="SLAbilitySystemLibrary|CharacterClassDefaults")
-	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
+	static void GiveStartupAbilities(const UObject* WorldContextObject,
+	                                 UAbilitySystemComponent* ASC,
+	                                 ECharacterClass CharacterClass);
+
+	UFUNCTION(BlueprintCallable, Category="SLAbilitySystemLibrary|CharacterClassDefaults")
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category="SLAbilitySystemLibrary|GameplayEffect")
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	UFUNCTION(BlueprintCallable, Category="SLAbilitySystemLibrary|GameplayEffect")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit);
+
+	UFUNCTION(BlueprintCallable, Category="SLAbilitySystemLibrary|GameplayMechanics")
+	static void GetLivePlayersWithinRadius(const UObject* WorldContextObject,
+	                                       TArray<AActor*>& OutOverlappingActors,
+	                                       const TArray<AActor*>& ActorsToIgnore,
+	                                       float Radius,
+	                                       const FVector& SphereOrigin);
+
+	UFUNCTION(BlueprintPure, Category="SLAbilitySystemLibrary|GameplayMechanics")
+	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 };
