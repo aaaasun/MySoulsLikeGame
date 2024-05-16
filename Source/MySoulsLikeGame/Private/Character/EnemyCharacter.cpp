@@ -12,13 +12,10 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "MySoulsLikeGame/MySoulsLikeGame.h"
 #include "UI/Widgets/SLUserWidget.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
-	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Block);
-
 	AbilitySystemComponent = CreateDefaultSubobject<USLAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);

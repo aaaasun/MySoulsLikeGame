@@ -14,5 +14,6 @@ class MYSOULSLIKEGAME_API USLMeleeAttack : public USLDamageGameplayAbility
 {
 	GENERATED_BODY()
 
+public:
 	
 };

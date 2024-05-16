@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Abilities/SLDamageGameplayAbility.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "SLCharacterBase.generated.h"
@@ -29,10 +30,9 @@ public:
 	/** Combat Interface */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual void Die() override;
-	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	virtual USkeletalMeshComponent* GetCombatComponent_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
-	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	/** end Combat Interface */
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -46,26 +46,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Bow;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	FName BowTipSocketName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	FName WeaponTipSocketName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	FName RightHandSocketName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	FName LeftHandSocketName;
-
-	bool bDead = false;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> ArrowPouch;
+
+	bool bDead = false;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

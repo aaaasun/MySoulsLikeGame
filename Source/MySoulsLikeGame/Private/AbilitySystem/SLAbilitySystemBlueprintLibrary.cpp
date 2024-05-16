@@ -126,29 +126,30 @@ void USLAbilitySystemBlueprintLibrary::SetIsCriticalHit(FGameplayEffectContextHa
 }
 
 void USLAbilitySystemBlueprintLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject,
-                                                                  TArray<AActor*>& OutOverlappingActors,
+                                                                  TArray<AActor*>& OutOnHitActors,
                                                                   const TArray<AActor*>& ActorsToIgnore,
-                                                                  float Radius,
-                                                                  const FVector& SphereOrigin)
+                                                                  const FVector& Extent,
+                                                                  const FVector& Start,
+                                                                  const FVector& End)
 {
 	//参考内置的UGameplayStatics::ApplyRadialDamageWithFalloff
-	FCollisionQueryParams SphereParams;
-	SphereParams.AddIgnoredActors(ActorsToIgnore);
+	FCollisionQueryParams CapsuleParams;
+	CapsuleParams.AddIgnoredActors(ActorsToIgnore);
 
 	if (const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject,
 	                                                             EGetWorldErrorMode::LogAndReturnNull))
 	{
-		TArray<FOverlapResult> Overlaps;
-		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity,
-		                                FCollisionObjectQueryParams(
-			                                FCollisionObjectQueryParams::InitType::AllDynamicObjects),
-		                                FCollisionShape::MakeSphere(Radius), SphereParams);
-		for (FOverlapResult& Overlap : Overlaps)
+		TArray<FHitResult> OutHits;
+		World->SweepMultiByObjectType(OutHits, Start, End, FQuat::Identity,
+		                              FCollisionObjectQueryParams(
+			                              FCollisionObjectQueryParams::InitType::AllDynamicObjects),
+		                              FCollisionShape::MakeCapsule(Extent), CapsuleParams);
+		for (FHitResult& OutHit : OutHits)
 		{
-			if (Overlap.GetActor()->Implements<UCombatInterface>() &&
-				!ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			if (OutHit.GetActor()->Implements<UCombatInterface>() &&
+				!ICombatInterface::Execute_IsDead(OutHit.GetActor()))
 			{
-				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
+				OutOnHitActors.AddUnique(ICombatInterface::Execute_GetAvatar(OutHit.GetActor()));
 			}
 		}
 	}

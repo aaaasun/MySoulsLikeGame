@@ -22,8 +22,8 @@ void USLProjectileSpell::SpawnProjectile(const FVector& TraceHitTarget)
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
 
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(
-		GetAvatarActorFromActorInfo(), FSLGameplayTags::Get().Montage_Attack_Bow);
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatComponent(
+		GetAvatarActorFromActorInfo(), FSLGameplayTags::Get().Montage_Attack_Bow)->GetSocketLocation("BowTipSocket");
 	const FVector HitTarget = TraceHitTarget;
 	const FVector ToTarget = HitTarget - SocketLocation;
 	const FRotator TargetRotation = ToTarget.Rotation();
@@ -52,7 +52,6 @@ void USLProjectileSpell::SpawnProjectile(const FVector& TraceHitTarget)
 	TArray<TWeakObjectPtr<AActor>> Actors;
 	Actors.Add(Projectile);
 	EffectContextHandle.AddActors(Actors); //设置Actors
-	//HitResult我在Projectile OnHit时设置
 
 	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(
 		DamageEffectClass,

@@ -48,8 +48,9 @@ public:
 	static void GetLivePlayersWithinRadius(const UObject* WorldContextObject,
 	                                       TArray<AActor*>& OutOverlappingActors,
 	                                       const TArray<AActor*>& ActorsToIgnore,
-	                                       float Radius,
-	                                       const FVector& SphereOrigin);
+	                                       const FVector& Extent,
+	                                       const FVector& Start,
+	                                       const FVector& End);
 
 	UFUNCTION(BlueprintPure, Category="SLAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);

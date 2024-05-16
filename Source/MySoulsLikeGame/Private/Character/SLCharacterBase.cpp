@@ -7,6 +7,7 @@
 #include "SLGameplayTags.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "MySoulsLikeGame/MySoulsLikeGame.h"
 
 ASLCharacterBase::ASLCharacterBase()
 {
@@ -16,6 +17,7 @@ ASLCharacterBase::ASLCharacterBase()
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
@@ -47,27 +49,27 @@ void ASLCharacterBase::Die()
 	MulticastHandleDeath();
 }
 
-FVector ASLCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
+USkeletalMeshComponent* ASLCharacterBase::GetCombatComponent_Implementation(const FGameplayTag& MontageTag)
 {
 	//基于蒙太奇返回正确的插槽
 	const FSLGameplayTags& GameplayTags = FSLGameplayTags::Get();
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
 	{
-		return Weapon->GetSocketLocation(WeaponTipSocketName);
+		return Weapon;
 	}
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Bow) && IsValid(Bow))
 	{
-		return Bow->GetSocketLocation(BowTipSocketName);
+		return Bow;
 	}
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
 	{
-		return GetMesh()->GetSocketLocation(RightHandSocketName);
+		return GetMesh();
 	}
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
 	{
-		return GetMesh()->GetSocketLocation(LeftHandSocketName);
+		return GetMesh();
 	}
-	return FVector();
+	return nullptr;
 }
 
 void ASLCharacterBase::MulticastHandleDeath_Implementation()
@@ -99,11 +101,6 @@ bool ASLCharacterBase::IsDead_Implementation() const
 AActor* ASLCharacterBase::GetAvatar_Implementation()
 {
 	return this;
-}
-
-TArray<FTaggedMontage> ASLCharacterBase::GetAttackMontages_Implementation()
-{
-	return AttackMontages;
 }
 
 void ASLCharacterBase::InitAbilityActorInfo()
