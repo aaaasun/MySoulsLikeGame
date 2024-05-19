@@ -44,6 +44,8 @@ void AEnemyCharacter::PossessedBy(AController* NewController)
 	SLAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	SLAIController->GetBlackboardComponent()->SetValueAsBool(
 		FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
+
+	SpawnDefaultWeapon();
 }
 
 int32 AEnemyCharacter::GetPlayerLevel()

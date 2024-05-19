@@ -17,6 +17,10 @@ class MYSOULSLIKEGAME_API USLAssetManager : public UAssetManager
 public:
 	static USLAssetManager& Get();
 
+	/** 物品的静态类型 */
+	static const FPrimaryAssetType	PotionItemType;
+	static const FPrimaryAssetType	WeaponItemType;
+
 protected:
 	virtual void StartInitialLoading() override;
 };

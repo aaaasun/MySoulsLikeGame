@@ -30,7 +30,7 @@ class MYSOULSLIKEGAME_API USLDamageGameplayAbility : public USLGameplayAbility
 public:
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TArray<FTaggedMontage> AttackMontages;
-	
+
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
 
@@ -43,6 +43,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsActivating = IsActive();
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;

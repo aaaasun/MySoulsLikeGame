@@ -5,6 +5,7 @@
 
 #include "SLGameplayTags.h"
 #include "AbilitySystem/Abilities/SLGameplayAbility.h"
+#include "Interaction/CombatInterface.h"
 
 //函数调用时我们知道AbilityActorInfo被设置好了
 void USLAbilitySystemComponent::AbilityActorInfoSet()
@@ -14,16 +15,16 @@ void USLAbilitySystemComponent::AbilityActorInfoSet()
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &USLAbilitySystemComponent::ClientEffectApplied);
 }
 
-void USLAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
+void USLAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilities)
 {
-	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : InAbilities)
 	{
 		//如何赋予能力
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		if (const USLGameplayAbility* SLAbility = Cast<USLGameplayAbility>(AbilitySpec.Ability))
 		{
 			//动态能力标签（DynamicAbilityTags）：可选择复制的能力标签，这些标签也会被应用的游戏效果捕获，作为源标签。
-			AbilitySpec.DynamicAbilityTags.AddTag(SLAbility->StartupInputTag);
+			AbilitySpec.DynamicAbilityTags.AddTag(SLAbility->AbilitiesInputTag);
 			GiveAbility(AbilitySpec);
 		}
 	}
@@ -41,6 +42,10 @@ void USLAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 			{
 				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, AbilitySpec.Handle,
 				                      AbilitySpec.ActivationInfo.GetActivationPredictionKey());
+			}
+			else
+			{
+				Cast<ICombatInterface>(GetAvatarActor())->Execute_AbilitiesCombo(GetAvatarActor());
 			}
 		}
 	}

@@ -57,6 +57,9 @@ public:
 	FGameplayTag Player_Block_InputHeld;
 	FGameplayTag Player_Block_InputReleased;
 
+	FGameplayTag Weapon_Melee_Sword;
+	FGameplayTag Weapon_Ranged_Bow;
+
 private:
 	static FSLGameplayTags GameplayTags;
 };

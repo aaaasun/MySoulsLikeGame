@@ -134,4 +134,13 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Player.Block.InputReleased"), FString("阻止松开输入"));
+
+	/**
+	 *Weapon
+	*/
+	GameplayTags.Weapon_Melee_Sword = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Weapon.Melee.Sword"), FString("近战武器剑"));
+
+	GameplayTags.Weapon_Ranged_Bow = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Weapon.Ranged.Bow"), FString("远程武器弓"));
 }

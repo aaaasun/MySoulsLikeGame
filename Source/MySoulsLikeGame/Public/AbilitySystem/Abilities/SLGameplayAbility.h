@@ -19,5 +19,5 @@ public:
 
 	//启用输入标签，用于在开始赋予角色标签时做检查
 	UPROPERTY(EditDefaultsOnly, Category="Input")
-	FGameplayTag StartupInputTag;
+	FGameplayTag AbilitiesInputTag;
 };

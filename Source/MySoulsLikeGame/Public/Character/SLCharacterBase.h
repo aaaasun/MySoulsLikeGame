@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "SLCharacterBase.generated.h"
 
+class ASLBaseWeapon;
 class USpringArmComponent;
 class UCameraComponent;
 class UGameplayAbility;
@@ -24,6 +25,7 @@ class MYSOULSLIKEGAME_API ASLCharacterBase : public ACharacter, public IAbilityS
 
 public:
 	ASLCharacterBase();
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
@@ -35,21 +37,54 @@ public:
 	virtual AActor* GetAvatar_Implementation() override;
 	/** end Combat Interface */
 
+	UPROPERTY(EditAnywhere, Category="Combat")
+	TArray<FTaggedMontage> AttackMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	bool EnableComboPeriod = true;
+
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
-	UPROPERTY(EditAnywhere, Category="Combat")
-	TArray<FTaggedMontage> AttackMontages;
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	ASLBaseWeapon* GetMeleeWeapon();
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	ASLBaseWeapon* GetRangedWeapon();
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void SetMeleeWeapon(ASLBaseWeapon* NewMeleeWeapon);
+
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void SetRangedWeapon(ASLBaseWeapon* NewRangedWeapon);
+
+	UFUNCTION(BlueprintCallable, Category="Abilities")
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilities);
+
+	UFUNCTION(BlueprintCallable, Category="Combat")
+	void JumpSectionForCombo(FName NextSection);
 
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ASLBaseWeapon> DefaultMeleeWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName MeleeWeaponAttachSocket;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ASLBaseWeapon> DefaultRangedWeaponClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName RangedWeaponAttachSocket;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Bow;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> ArrowPouch;
 
@@ -73,13 +108,18 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+
 	virtual void InitializeDefaultAttributes() const;
 
-	void AddCharacterAbilities();
+	UFUNCTION(BlueprintImplementableEvent, Category="Weapon")
+	void SpawnDefaultWeapon();
 
 private:
-	UPROPERTY(EditAnywhere, Category="Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	UPROPERTY()
+	TObjectPtr<ASLBaseWeapon> MeleeWeapon;
+
+	UPROPERTY()
+	TObjectPtr<ASLBaseWeapon> RangedWeapon;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;

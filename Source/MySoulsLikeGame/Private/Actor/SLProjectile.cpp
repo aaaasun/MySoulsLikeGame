@@ -45,6 +45,7 @@ void ASLProjectile::Destroyed()
 	if (!bHit && !HasAuthority())
 	{
 		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+		ProjectileMovement->StopMovementImmediately();
 	}
 	Super::Destroyed();
 }
@@ -67,6 +68,7 @@ void ASLProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (!bHit)
 	{
 		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+		ProjectileMovement->StopMovementImmediately();
 	}
 	if (HasAuthority())
 	{

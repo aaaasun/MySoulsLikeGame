@@ -26,13 +26,23 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
-	
+
 	/**Combat Interaction**/
 	virtual int32 GetPlayerLevel() override;
 	/**end Combat Interaction**/
 
 protected:
-	
+	UPROPERTY()
+	bool bAbilitiesInitialized = false;
+
+	void AddStartupAbilities();
+
+	UFUNCTION(BlueprintCallable, Category="Abilities")
+	void AddWeaponAbilities(ASLBaseWeapon* InWeapon);
+
 private:
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
 	virtual void InitAbilityActorInfo() override;
 };

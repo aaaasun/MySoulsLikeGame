@@ -46,4 +46,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnHit(const FHitResult& HitResult);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AbilitiesCombo();
 };

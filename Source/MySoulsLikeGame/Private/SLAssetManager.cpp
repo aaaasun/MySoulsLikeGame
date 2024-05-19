@@ -6,6 +6,9 @@
 #include "AbilitySystemGlobals.h"
 #include "SLGameplayTags.h"
 
+const FPrimaryAssetType USLAssetManager::PotionItemType = TEXT("Potion");
+const FPrimaryAssetType USLAssetManager::WeaponItemType = TEXT("Weapon");
+
 USLAssetManager& USLAssetManager::Get()
 {
 	check(GEngine);

@@ -6,12 +6,15 @@
 #include "AbilitySystemComponent.h"
 #include "SLGameplayTags.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
+#include "Actor/SLBaseWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "MySoulsLikeGame/MySoulsLikeGame.h"
 
 ASLCharacterBase::ASLCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	bReplicates = true;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
@@ -44,6 +47,8 @@ UAnimMontage* ASLCharacterBase::GetHitReactMontage_Implementation()
 
 void ASLCharacterBase::Die()
 {
+	GetMeleeWeapon()->SetLifeSpan(GetMeleeWeapon()->GetLifeSpanAfterDeath());
+	GetRangedWeapon()->SetLifeSpan(GetRangedWeapon()->GetLifeSpanAfterDeath());
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	Bow->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath();
@@ -103,6 +108,26 @@ AActor* ASLCharacterBase::GetAvatar_Implementation()
 	return this;
 }
 
+ASLBaseWeapon* ASLCharacterBase::GetMeleeWeapon()
+{
+	return MeleeWeapon;
+}
+
+ASLBaseWeapon* ASLCharacterBase::GetRangedWeapon()
+{
+	return RangedWeapon;
+}
+
+void ASLCharacterBase::SetMeleeWeapon(ASLBaseWeapon* NewMeleeWeapon)
+{
+	MeleeWeapon = NewMeleeWeapon;
+}
+
+void ASLCharacterBase::SetRangedWeapon(ASLBaseWeapon* NewRangedWeapon)
+{
+	RangedWeapon = NewRangedWeapon;
+}
+
 void ASLCharacterBase::InitAbilityActorInfo()
 {
 }
@@ -124,10 +149,22 @@ void ASLCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
-void ASLCharacterBase::AddCharacterAbilities()
+void ASLCharacterBase::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilities)
 {
-	USLAbilitySystemComponent* SLASC = CastChecked<USLAbilitySystemComponent>(AbilitySystemComponent);
 	//检查权限
 	if (!HasAuthority()) return;
-	SLASC->AddCharacterAbilities(StartupAbilities);
+	USLAbilitySystemComponent* SLASC = CastChecked<USLAbilitySystemComponent>(AbilitySystemComponent);
+	SLASC->AddCharacterAbilities(InAbilities);
+}
+
+void ASLCharacterBase::JumpSectionForCombo(const FName NextSection)
+{
+	if (EnableComboPeriod)
+	{
+		UAnimInstance* Anim = GetMesh()->GetAnimInstance();
+		const UAnimMontage* CurMontage = Anim->GetCurrentActiveMontage();
+		const FName CurSection = Anim->Montage_GetCurrentSection(CurMontage);
+		Anim->Montage_SetNextSection(CurSection, NextSection, CurMontage);
+		EnableComboPeriod = false;
+	}
 }

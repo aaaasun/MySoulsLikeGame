@@ -37,7 +37,7 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float LifeSpan = 15.f;
+	float LifeSpan = 5.f;
 
 	bool bHit = false;
 
