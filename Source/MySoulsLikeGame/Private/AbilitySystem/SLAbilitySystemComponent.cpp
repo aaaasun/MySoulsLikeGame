@@ -40,6 +40,7 @@ void USLAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 			AbilitySpecInputPressed(AbilitySpec);
 			if (!AbilitySpec.IsActive())
 			{
+				//调用向给定的通用复制事件注册的本地回调
 				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, AbilitySpec.Handle,
 				                      AbilitySpec.ActivationInfo.GetActivationPredictionKey());
 			}

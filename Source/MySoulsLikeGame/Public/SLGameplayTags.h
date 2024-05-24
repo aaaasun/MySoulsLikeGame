@@ -33,7 +33,9 @@ public:
 	FGameplayTag Input_LMB;
 	FGameplayTag Input_RMB;
 	FGameplayTag Input_1;
-	FGameplayTag Input_Alt;
+	FGameplayTag Input_C;
+	FGameplayTag Input_E;
+	FGameplayTag Input_Space;
 
 	FGameplayTag Damage;
 	FGameplayTag Damage_Physical;

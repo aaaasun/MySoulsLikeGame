@@ -60,6 +60,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="Combat")
 	TObjectPtr<AActor> CombatTarget;
 
+	UFUNCTION()
+	void SpawnDefaultWeapon();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
@@ -79,4 +82,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<ASLAIController> SLAIController;
+
+private:
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TSubclassOf<UGameplayAbility> WeaponInitializationAbility;
 };

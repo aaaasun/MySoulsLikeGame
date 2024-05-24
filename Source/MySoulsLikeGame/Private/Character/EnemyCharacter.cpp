@@ -7,6 +7,7 @@
 #include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "AbilitySystem/SLAttributeSet.h"
+#include "Actor/SLBaseWeapon.h"
 #include "AI/SLAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -80,7 +81,6 @@ void AEnemyCharacter::BeginPlay()
 		USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 
-
 	//显示敌人的面板,同OverlayWidgetController,也可以封装到一个类里
 	if (USLUserWidget* SLUserWidget = Cast<USLUserWidget>(AttributeBar->GetUserWidgetObject()))
 	{
@@ -128,6 +128,24 @@ void AEnemyCharacter::BeginPlay()
 		OnMaxHealthChanged.Broadcast(SLAttributeSet->GetMaxHealth());
 		OnStaminaChanged.Broadcast(SLAttributeSet->GetStamina());
 		OnMaxStaminaChanged.Broadcast(SLAttributeSet->GetMaxStamina());
+	}
+
+	SpawnDefaultWeapon();
+
+	AbilitySystemComponent->TryActivateAbilityByClass(WeaponInitializationAbility);
+}
+
+void AEnemyCharacter::SpawnDefaultWeapon()
+{
+	if (DefaultMeleeWeaponClass)
+	{
+		ASLBaseWeapon* DefaultMeleeWeapon = GetWorld()->SpawnActor<ASLBaseWeapon>(DefaultMeleeWeaponClass);
+		CombatComponent->SetMeleeWeapon(DefaultMeleeWeapon);
+	}
+	if (DefaultRangedWeaponClass)
+	{
+		ASLBaseWeapon* DefaultRangedWeapon = GetWorld()->SpawnActor<ASLBaseWeapon>(DefaultRangedWeaponClass);
+		CombatComponent->SetRangedWeapon(DefaultRangedWeapon);
 	}
 }
 

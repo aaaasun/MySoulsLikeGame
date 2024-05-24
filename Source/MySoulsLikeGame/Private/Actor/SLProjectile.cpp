@@ -68,6 +68,7 @@ void ASLProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	if (!bHit)
 	{
 		if (LoopingSoundComponent) LoopingSoundComponent->Stop();
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		ProjectileMovement->StopMovementImmediately();
 	}
 	if (HasAuthority())
@@ -81,7 +82,6 @@ void ASLProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
 		Destroyed();
-		Destroy();
 	}
 	else
 	{

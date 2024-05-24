@@ -37,9 +37,6 @@ protected:
 
 	void AddStartupAbilities();
 
-	UFUNCTION(BlueprintCallable, Category="Abilities")
-	void AddWeaponAbilities(ASLBaseWeapon* InWeapon);
-
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;

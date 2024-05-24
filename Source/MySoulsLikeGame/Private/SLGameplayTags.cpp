@@ -59,8 +59,14 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Input_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.1"), FString("键盘数字1"));
 
-	GameplayTags.Input_Alt = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Input.Alt"), FString("键盘左Alt"));
+	GameplayTags.Input_C = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.C"), FString("键盘C"));
+
+	GameplayTags.Input_E = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.E"), FString("键盘E"));
+
+	GameplayTags.Input_Space = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Space"), FString("键盘空格"));
 
 	/**
 	 *Damage

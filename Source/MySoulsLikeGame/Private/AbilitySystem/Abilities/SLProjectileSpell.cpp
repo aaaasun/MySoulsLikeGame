@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "SLGameplayTags.h"
+#include "Actor/SLBaseWeapon.h"
 #include "Actor/SLProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -22,8 +23,9 @@ void USLProjectileSpell::SpawnProjectile(const FVector& TraceHitTarget)
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
 
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatComponent(
-		GetAvatarActorFromActorInfo(), FSLGameplayTags::Get().Montage_Attack_Bow)->GetSocketLocation("BowTipSocket");
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatWeapon(
+		GetAvatarActorFromActorInfo(),
+		FSLGameplayTags::Get().Montage_Attack_Bow)->GetWeapon()->GetSocketLocation("BowTipSocket");
 	const FVector HitTarget = TraceHitTarget;
 	const FVector ToTarget = HitTarget - SocketLocation;
 	const FRotator TargetRotation = ToTarget.Rotation();

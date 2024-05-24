@@ -35,7 +35,6 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
 
-
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -45,7 +44,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	if (HasAuthority() && !bAbilitiesInitialized)
 	{
 		AddStartupAbilities();
-		SpawnDefaultWeapon();
 		bAbilitiesInitialized = true;
 	}
 }
@@ -63,18 +61,6 @@ int32 APlayerCharacter::GetPlayerLevel()
 	const ASLPlayerState* SLPlayerState = GetPlayerState<ASLPlayerState>();
 	check(SLPlayerState);
 	return SLPlayerState->GetPlayerLevel();
-}
-
-void APlayerCharacter::AddWeaponAbilities(ASLBaseWeapon* InWeapon)
-{
-	check(AbilitySystemComponent);
-	if (HasAuthority())
-	{
-		if (InWeapon)
-		{
-			AddCharacterAbilities(InWeapon->GetWeaponAbilities());
-		}
-	}
 }
 
 void APlayerCharacter::AddStartupAbilities()

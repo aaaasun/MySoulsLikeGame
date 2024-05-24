@@ -8,7 +8,9 @@
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Actor/SLBaseWeapon.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/CombatComponent.h"
 #include "MySoulsLikeGame/MySoulsLikeGame.h"
+#include "Net/UnrealNetwork.h"
 
 ASLCharacterBase::ASLCharacterBase()
 {
@@ -21,6 +23,9 @@ ASLCharacterBase::ASLCharacterBase()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComponent->SetIsReplicated(true);
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
@@ -35,6 +40,28 @@ ASLCharacterBase::ASLCharacterBase()
 	ArrowPouch->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ASLCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ASLCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ASLCharacterBase, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void ASLCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (CombatComponent)
+	{
+		CombatComponent->Character = this;
+	}
+}
+
 UAbilitySystemComponent* ASLCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -47,34 +74,39 @@ UAnimMontage* ASLCharacterBase::GetHitReactMontage_Implementation()
 
 void ASLCharacterBase::Die()
 {
-	GetMeleeWeapon()->SetLifeSpan(GetMeleeWeapon()->GetLifeSpanAfterDeath());
-	GetRangedWeapon()->SetLifeSpan(GetRangedWeapon()->GetLifeSpanAfterDeath());
-	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	Bow->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	CombatComponent->EquippedMeleeWeapon->SetLifeSpan(CombatComponent->EquippedMeleeWeapon->GetLifeSpanAfterDeath());
+	CombatComponent->EquippedRangedWeapon->SetLifeSpan(CombatComponent->EquippedRangedWeapon->GetLifeSpanAfterDeath());
 	MulticastHandleDeath();
 }
 
-USkeletalMeshComponent* ASLCharacterBase::GetCombatComponent_Implementation(const FGameplayTag& MontageTag)
+UCombatComponent* ASLCharacterBase::GetCombatComponent_Implementation()
+{
+	return CombatComponent;
+}
+
+ASLBaseWeapon* ASLCharacterBase::GetOverlapWeapon_Implementation()
+{
+	return OverlappingWeapon;
+}
+
+ASLBaseWeapon* ASLCharacterBase::GetCombatWeapon_Implementation(const FGameplayTag& MontageTag)
 {
 	//基于蒙太奇返回正确的插槽
 	const FSLGameplayTags& GameplayTags = FSLGameplayTags::Get();
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
 	{
-		return Weapon;
+		return CombatComponent->EquippedMeleeWeapon;
 	}
 	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Bow) && IsValid(Bow))
 	{
-		return Bow;
-	}
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_RightHand))
-	{
-		return GetMesh();
-	}
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_LeftHand))
-	{
-		return GetMesh();
+		return CombatComponent->EquippedRangedWeapon;
 	}
 	return nullptr;
+}
+
+USkeletalMeshComponent* ASLCharacterBase::GetCharacterMesh_Implementation()
+{
+	return GetMesh();
 }
 
 void ASLCharacterBase::MulticastHandleDeath_Implementation()
@@ -93,11 +125,6 @@ void ASLCharacterBase::MulticastHandleDeath_Implementation()
 	bDead = true;
 }
 
-void ASLCharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 bool ASLCharacterBase::IsDead_Implementation() const
 {
 	return bDead;
@@ -106,26 +133,6 @@ bool ASLCharacterBase::IsDead_Implementation() const
 AActor* ASLCharacterBase::GetAvatar_Implementation()
 {
 	return this;
-}
-
-ASLBaseWeapon* ASLCharacterBase::GetMeleeWeapon()
-{
-	return MeleeWeapon;
-}
-
-ASLBaseWeapon* ASLCharacterBase::GetRangedWeapon()
-{
-	return RangedWeapon;
-}
-
-void ASLCharacterBase::SetMeleeWeapon(ASLBaseWeapon* NewMeleeWeapon)
-{
-	MeleeWeapon = NewMeleeWeapon;
-}
-
-void ASLCharacterBase::SetRangedWeapon(ASLBaseWeapon* NewRangedWeapon)
-{
-	RangedWeapon = NewRangedWeapon;
 }
 
 void ASLCharacterBase::InitAbilityActorInfo()
@@ -147,6 +154,34 @@ void ASLCharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
+
+void ASLCharacterBase::OnRep_OverlappingWeapon(ASLBaseWeapon* LastWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+	if (LastWeapon)
+	{
+		LastWeapon->ShowPickupWidget(false);
+	}
+}
+
+void ASLCharacterBase::SetOverlappingWeapon(ASLBaseWeapon* InWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+	OverlappingWeapon = InWeapon;
+	if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}
 }
 
 void ASLCharacterBase::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilities)

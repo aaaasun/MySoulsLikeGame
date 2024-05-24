@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Components/CombatComponent.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
@@ -28,7 +29,16 @@ public:
 	virtual int32 GetPlayerLevel();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	USkeletalMeshComponent* GetCombatComponent(const FGameplayTag& MontageTag);
+	UCombatComponent* GetCombatComponent();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ASLBaseWeapon* GetOverlapWeapon();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ASLBaseWeapon* GetCombatWeapon(const FGameplayTag& MontageTag);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USkeletalMeshComponent* GetCharacterMesh();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);

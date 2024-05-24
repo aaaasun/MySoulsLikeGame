@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "SLCharacterBase.generated.h"
 
+class UCombatComponent;
 class ASLBaseWeapon;
 class USpringArmComponent;
 class UCameraComponent;
@@ -32,7 +33,10 @@ public:
 	/** Combat Interface */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual void Die() override;
-	virtual USkeletalMeshComponent* GetCombatComponent_Implementation(const FGameplayTag& MontageTag) override;
+	virtual UCombatComponent* GetCombatComponent_Implementation() override;
+	virtual ASLBaseWeapon* GetOverlapWeapon_Implementation() override;
+	virtual ASLBaseWeapon* GetCombatWeapon_Implementation(const FGameplayTag& MontageTag) override;
+	virtual USkeletalMeshComponent* GetCharacterMesh_Implementation() override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
 	/** end Combat Interface */
@@ -46,17 +50,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	ASLBaseWeapon* GetMeleeWeapon();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	ASLBaseWeapon* GetRangedWeapon();
-
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void SetMeleeWeapon(ASLBaseWeapon* NewMeleeWeapon);
-
-	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void SetRangedWeapon(ASLBaseWeapon* NewRangedWeapon);
+	virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintCallable, Category="Abilities")
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilities);
@@ -67,17 +63,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UCombatComponent> CombatComponent;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASLBaseWeapon> DefaultMeleeWeaponClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName MeleeWeaponAttachSocket;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASLBaseWeapon> DefaultRangedWeaponClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName RangedWeaponAttachSocket;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
@@ -111,16 +104,16 @@ protected:
 
 	virtual void InitializeDefaultAttributes() const;
 
-	UFUNCTION(BlueprintImplementableEvent, Category="Weapon")
-	void SpawnDefaultWeapon();
-
 private:
-	UPROPERTY()
-	TObjectPtr<ASLBaseWeapon> MeleeWeapon;
-
-	UPROPERTY()
-	TObjectPtr<ASLBaseWeapon> RangedWeapon;
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	TObjectPtr<ASLBaseWeapon> OverlappingWeapon;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(ASLBaseWeapon* LastWeapon);
+
+public:
+	void SetOverlappingWeapon(ASLBaseWeapon* InWeapon);
 };
