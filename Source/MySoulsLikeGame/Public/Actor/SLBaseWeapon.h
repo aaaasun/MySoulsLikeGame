@@ -40,6 +40,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION()
 	void ShowPickupWidget(bool bShowWidget);
 
 	UFUNCTION(BlueprintCallable, Category="Weapon Properties")
@@ -48,7 +49,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 
-	UFUNCTION(BlueprintCallable, Category="Weapon")
+	UFUNCTION(BlueprintCallable, Category="Weapon Properties")
 	void AttachToCharacter(const FName WeaponSocket);
 
 	UFUNCTION(BlueprintCallable, Category="Abilities")
@@ -56,6 +57,9 @@ public:
 
 	UFUNCTION()
 	float GetLifeSpanAfterDeath() const;
+
+	UFUNCTION()
+	EWeaponState GetWeaponState();
 
 	UFUNCTION()
 	void SetWeaponState(EWeaponState State);

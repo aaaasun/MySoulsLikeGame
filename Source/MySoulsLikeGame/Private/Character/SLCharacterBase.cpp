@@ -26,18 +26,6 @@ ASLCharacterBase::ASLCharacterBase()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
-
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
-	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
-	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	Bow = CreateDefaultSubobject<USkeletalMeshComponent>("Bow");
-	Bow->SetupAttachment(GetMesh(), FName("BowSocket"));
-	Bow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	ArrowPouch = CreateDefaultSubobject<USkeletalMeshComponent>("ArrowPouch");
-	ArrowPouch->SetupAttachment(GetMesh(), FName("BowArrowSocket"));
-	ArrowPouch->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ASLCharacterBase::BeginPlay()
@@ -74,8 +62,16 @@ UAnimMontage* ASLCharacterBase::GetHitReactMontage_Implementation()
 
 void ASLCharacterBase::Die()
 {
-	CombatComponent->EquippedMeleeWeapon->SetLifeSpan(CombatComponent->EquippedMeleeWeapon->GetLifeSpanAfterDeath());
-	CombatComponent->EquippedRangedWeapon->SetLifeSpan(CombatComponent->EquippedRangedWeapon->GetLifeSpanAfterDeath());
+	if (CombatComponent->EquippedMeleeWeapon)
+	{
+		CombatComponent->EquippedMeleeWeapon->
+		                 SetLifeSpan(CombatComponent->EquippedMeleeWeapon->GetLifeSpanAfterDeath());
+	}
+	if (CombatComponent->EquippedRangedWeapon)
+	{
+		CombatComponent->EquippedRangedWeapon->
+		                 SetLifeSpan(CombatComponent->EquippedRangedWeapon->GetLifeSpanAfterDeath());
+	}
 	MulticastHandleDeath();
 }
 
@@ -93,11 +89,11 @@ ASLBaseWeapon* ASLCharacterBase::GetCombatWeapon_Implementation(const FGameplayT
 {
 	//基于蒙太奇返回正确的插槽
 	const FSLGameplayTags& GameplayTags = FSLGameplayTags::Get();
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(Weapon))
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Weapon) && IsValid(CombatComponent->EquippedMeleeWeapon))
 	{
 		return CombatComponent->EquippedMeleeWeapon;
 	}
-	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Bow) && IsValid(Bow))
+	if (MontageTag.MatchesTagExact(GameplayTags.Montage_Attack_Bow) && IsValid(CombatComponent->EquippedRangedWeapon))
 	{
 		return CombatComponent->EquippedRangedWeapon;
 	}
@@ -111,12 +107,18 @@ USkeletalMeshComponent* ASLCharacterBase::GetCharacterMesh_Implementation()
 
 void ASLCharacterBase::MulticastHandleDeath_Implementation()
 {
-	Weapon->SetSimulatePhysics(true);
-	Weapon->SetEnableGravity(true);
-	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	Bow->SetSimulatePhysics(true);
-	Bow->SetEnableGravity(true);
-	Bow->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	if (ASLBaseWeapon* MeleeWeapon = CombatComponent->EquippedMeleeWeapon)
+	{
+		MeleeWeapon->GetWeapon()->SetSimulatePhysics(true);
+		MeleeWeapon->GetWeapon()->SetEnableGravity(true);
+		MeleeWeapon->GetWeapon()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+	if (ASLBaseWeapon* RangedWeapon = CombatComponent->EquippedRangedWeapon)
+	{
+		RangedWeapon->GetWeapon()->SetSimulatePhysics(true);
+		RangedWeapon->GetWeapon()->SetEnableGravity(true);
+		RangedWeapon->GetWeapon()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -158,7 +160,7 @@ void ASLCharacterBase::InitializeDefaultAttributes() const
 
 void ASLCharacterBase::OnRep_OverlappingWeapon(ASLBaseWeapon* LastWeapon)
 {
-	if (OverlappingWeapon)
+	if (OverlappingWeapon && OverlappingWeapon->GetWeaponState() != EWeaponState::EWS_Equipped)
 	{
 		OverlappingWeapon->ShowPickupWidget(true);
 	}
@@ -177,7 +179,7 @@ void ASLCharacterBase::SetOverlappingWeapon(ASLBaseWeapon* InWeapon)
 	OverlappingWeapon = InWeapon;
 	if (IsLocallyControlled())
 	{
-		if (OverlappingWeapon)
+		if (OverlappingWeapon && OverlappingWeapon->GetWeaponState() != EWeaponState::EWS_Equipped)
 		{
 			OverlappingWeapon->ShowPickupWidget(true);
 		}

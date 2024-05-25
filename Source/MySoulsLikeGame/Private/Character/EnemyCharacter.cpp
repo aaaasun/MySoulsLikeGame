@@ -11,6 +11,7 @@
 #include "AI/SLAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/Widgets/SLUserWidget.h"
@@ -57,6 +58,7 @@ int32 AEnemyCharacter::GetPlayerLevel()
 void AEnemyCharacter::Die()
 {
 	SetLifeSpan(LifeSpan);
+	if (SLAIController) SLAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	Super::Die();
 }
 
@@ -79,6 +81,9 @@ void AEnemyCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		USLAbilitySystemBlueprintLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
+
+		SpawnDefaultWeapon();
+		AbilitySystemComponent->TryActivateAbilityByClass(WeaponInitializationAbility);
 	}
 
 	//显示敌人的面板,同OverlayWidgetController,也可以封装到一个类里
@@ -129,20 +134,17 @@ void AEnemyCharacter::BeginPlay()
 		OnStaminaChanged.Broadcast(SLAttributeSet->GetStamina());
 		OnMaxStaminaChanged.Broadcast(SLAttributeSet->GetMaxStamina());
 	}
-
-	SpawnDefaultWeapon();
-
-	AbilitySystemComponent->TryActivateAbilityByClass(WeaponInitializationAbility);
 }
 
 void AEnemyCharacter::SpawnDefaultWeapon()
 {
-	if (DefaultMeleeWeaponClass)
+	if (DefaultMeleeWeaponClass && Execute_GetCombatWeapon(this, FSLGameplayTags::Get().Montage_Attack_Weapon) ==
+		nullptr)
 	{
 		ASLBaseWeapon* DefaultMeleeWeapon = GetWorld()->SpawnActor<ASLBaseWeapon>(DefaultMeleeWeaponClass);
 		CombatComponent->SetMeleeWeapon(DefaultMeleeWeapon);
 	}
-	if (DefaultRangedWeaponClass)
+	if (DefaultRangedWeaponClass && Execute_GetCombatWeapon(this, FSLGameplayTags::Get().Montage_Attack_Bow) == nullptr)
 	{
 		ASLBaseWeapon* DefaultRangedWeapon = GetWorld()->SpawnActor<ASLBaseWeapon>(DefaultRangedWeaponClass);
 		CombatComponent->SetRangedWeapon(DefaultRangedWeapon);

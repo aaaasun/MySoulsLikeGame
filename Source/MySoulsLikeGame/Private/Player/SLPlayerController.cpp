@@ -47,7 +47,7 @@ void ASLPlayerController::BeginPlay()
 
 void ASLPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputPressed))
+	if (GetASC() == nullptr && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputPressed))
 	{
 		return;
 	}
@@ -56,7 +56,7 @@ void ASLPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void ASLPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputReleased))
+	if (GetASC() == nullptr && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputReleased))
 	{
 		return;
 	}
@@ -65,7 +65,7 @@ void ASLPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ASLPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (GetASC() && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputHeld))
+	if (GetASC() == nullptr && GetASC()->HasMatchingGameplayTag(FSLGameplayTags::Get().Player_Block_InputHeld))
 	{
 		return;
 	}

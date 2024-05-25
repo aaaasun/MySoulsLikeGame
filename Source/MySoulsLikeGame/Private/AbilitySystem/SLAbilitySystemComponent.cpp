@@ -46,7 +46,7 @@ void USLAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Input
 			}
 			else
 			{
-				Cast<ICombatInterface>(GetAvatarActor())->Execute_AbilitiesCombo(GetAvatarActor());
+				ICombatInterface::Execute_AbilitiesCombo(GetAvatarActor());
 			}
 		}
 	}

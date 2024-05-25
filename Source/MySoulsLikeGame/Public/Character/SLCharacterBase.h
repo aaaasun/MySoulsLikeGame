@@ -72,15 +72,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASLBaseWeapon> DefaultRangedWeaponClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> Weapon;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> Bow;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
-	TObjectPtr<USkeletalMeshComponent> ArrowPouch;
-
 	bool bDead = false;
 
 	UPROPERTY()

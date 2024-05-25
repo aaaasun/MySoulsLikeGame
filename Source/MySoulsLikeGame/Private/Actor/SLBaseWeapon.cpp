@@ -61,7 +61,7 @@ void ASLBaseWeapon::BeginPlay()
 void ASLBaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
+
 	DOREPLIFETIME(ASLBaseWeapon, WeaponState);
 	DOREPLIFETIME(ASLBaseWeapon, WeaponClass);
 	DOREPLIFETIME(ASLBaseWeapon, AttachSocketName);
@@ -91,7 +91,7 @@ void ASLBaseWeapon::OnPickupAreaOverlap(UPrimitiveComponent* OverlappedComponent
                                         const FHitResult& SweepResult)
 {
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
-	if (PlayerCharacter)
+	if (PlayerCharacter && PlayerCharacter->ActorHasTag("Player"))
 	{
 		PlayerCharacter->SetOverlappingWeapon(this);
 	}
@@ -101,7 +101,7 @@ void ASLBaseWeapon::OnPickupAreaEndOverlap(UPrimitiveComponent* OverlappedCompon
                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
-	if (PlayerCharacter)
+	if (PlayerCharacter && PlayerCharacter->ActorHasTag("Player"))
 	{
 		PlayerCharacter->SetOverlappingWeapon(nullptr);
 	}
@@ -130,6 +130,11 @@ float ASLBaseWeapon::GetLifeSpanAfterDeath() const
 	return LifeSpan;
 }
 
+EWeaponState ASLBaseWeapon::GetWeaponState()
+{
+	return WeaponState;
+}
+
 void ASLBaseWeapon::SetWeaponState(EWeaponState State)
 {
 	WeaponState = State;
@@ -139,6 +144,7 @@ void ASLBaseWeapon::SetWeaponState(EWeaponState State)
 		ShowPickupWidget(false);
 		PickupArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
+	default: ;
 	}
 }
 
@@ -216,5 +222,6 @@ void ASLBaseWeapon::OnRep_WeaponState()
 		ShowPickupWidget(false);
 		PickupArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		break;
+	default: ;
 	}
 }

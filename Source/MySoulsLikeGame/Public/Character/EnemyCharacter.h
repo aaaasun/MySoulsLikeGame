@@ -59,7 +59,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category="Combat")
 	TObjectPtr<AActor> CombatTarget;
-
+	
 	UFUNCTION()
 	void SpawnDefaultWeapon();
 
