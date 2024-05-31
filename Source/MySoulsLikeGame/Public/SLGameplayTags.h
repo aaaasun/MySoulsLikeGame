@@ -32,6 +32,7 @@ public:
 
 	FGameplayTag Input_LMB;
 	FGameplayTag Input_RMB;
+	FGameplayTag Input_MMB;
 	FGameplayTag Input_1;
 	FGameplayTag Input_C;
 	FGameplayTag Input_E;
@@ -47,6 +48,7 @@ public:
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 
 	FGameplayTag Abilities_Attack;
+	FGameplayTag Abilities_LockOn;
 
 	FGameplayTag Montage_Attack_Weapon;
 	FGameplayTag Montage_Attack_Bow;

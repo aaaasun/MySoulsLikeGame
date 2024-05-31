@@ -9,6 +9,8 @@
 #include "Actor/SLBaseWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CombatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "MySoulsLikeGame/MySoulsLikeGame.h"
 #include "Net/UnrealNetwork.h"
 
@@ -38,6 +40,8 @@ void ASLCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ASLCharacterBase, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(ASLCharacterBase, bIsStaring);
+	DOREPLIFETIME(ASLCharacterBase, bDead);
 }
 
 void ASLCharacterBase::PostInitializeComponents()
@@ -137,8 +141,49 @@ AActor* ASLCharacterBase::GetAvatar_Implementation()
 	return this;
 }
 
+ASLCharacterBase* ASLCharacterBase::GetLockOnTarget_Implementation()
+{
+	return LockTarget;
+}
+
+void ASLCharacterBase::SetLockOnTarget_Implementation(ASLCharacterBase* InLockTarget)
+{
+	LockTarget = InLockTarget;
+}
+
+bool ASLCharacterBase::IsStaring_Implementation()
+{
+	return bIsStaring;
+}
+
 void ASLCharacterBase::InitAbilityActorInfo()
 {
+}
+
+void ASLCharacterBase::FocusOnTarget()
+{
+	if (IsValid(LockTarget))
+	{
+		bIsStaring = true;
+		const FVector ActorRotation = FVector(LockTarget->GetActorLocation().X, LockTarget->GetActorLocation().Y,
+		                                      LockTarget->GetActorLocation().Z - 150.f);
+		const FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(
+			GetActorLocation(), ActorRotation);
+		FRotator SmoothTargetRotation = UKismetMathLibrary::RInterpTo(GetController()->GetControlRotation(),
+		                                                              TargetRotation,
+		                                                              GetWorld()->DeltaTimeSeconds, 0.f);
+		SmoothTargetRotation = FRotator(GetController()->GetControlRotation().Pitch, SmoothTargetRotation.Yaw,
+		                                GetController()->GetControlRotation().Roll);
+		GetController()->SetControlRotation(SmoothTargetRotation);
+	}
+}
+
+void ASLCharacterBase::UnFocusTarget()
+{
+	if (!IsValid(LockTarget))
+	{
+		bIsStaring = false;
+	}
 }
 
 void ASLCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const

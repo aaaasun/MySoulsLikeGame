@@ -21,6 +21,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
@@ -29,6 +31,7 @@ public:
 
 	/**Combat Interaction**/
 	virtual int32 GetPlayerLevel() override;
+	virtual AActor* GetClosestEnemy_Implementation(float Radius, float Length) override;
 	/**end Combat Interaction**/
 
 protected:

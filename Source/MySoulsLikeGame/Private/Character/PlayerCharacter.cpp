@@ -3,34 +3,33 @@
 
 #include "Character/PlayerCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "CollisionDebugDrawingPublic.h"
+#include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Actor/SLBaseWeapon.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Player/SLPlayerController.h"
 #include "Player/SLPlayerState.h"
 #include "UI/HUD/SLHUD.h"
 
 APlayerCharacter::APlayerCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
-
-	// Don't rotate when the controller rotates. Let that just affect the camera.
+	PrimaryActorTick.bCanEverTick = true;
+	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-
-	// Create a camera boom (pulls in towards the player if there is a collision)
+	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
+	CameraBoom->bUsePawnControlRotation = true;
+	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
@@ -56,11 +55,65 @@ void APlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (IsValid(LockTarget))
+	{
+		FocusOnTarget();
+		bool Dead = Execute_IsDead(LockTarget);
+		if (Dead)
+		{
+			Execute_SetLockOnTarget(this, nullptr);
+		}
+	}
+	if (!IsValid(LockTarget))
+	{
+			UnFocusTarget();
+	}
+}
+
 int32 APlayerCharacter::GetPlayerLevel()
 {
 	const ASLPlayerState* SLPlayerState = GetPlayerState<ASLPlayerState>();
 	check(SLPlayerState);
 	return SLPlayerState->GetPlayerLevel();
+}
+
+AActor* APlayerCharacter::GetClosestEnemy_Implementation(float Radius, float Length)
+{
+	AActor* ClosestEnemy = nullptr;
+	TArray<FHitResult> HitResults;
+	const FVector Start = GetPawnViewLocation();
+	const FVector End = Start + GetActorForwardVector() * Length;
+	const FQuat Rot;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	FCollisionShape Sphere;
+	Sphere.MakeSphere(Radius);
+	Sphere.SetSphere(Radius);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	GetWorld()->SweepMultiByObjectType(HitResults, Start, End, Rot, ObjectQueryParams, Sphere, Params);
+	if (GetWorld()->SweepMultiByObjectType(HitResults, Start, End, Rot, ObjectQueryParams, Sphere, Params))
+	{
+		float ClosestDistance = 5000.f;
+		for (FHitResult Hit : HitResults)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor && USLAbilitySystemBlueprintLibrary::IsNotFriend(this, HitActor) && !Execute_IsDead(HitActor))
+			{
+				float Distance = HitActor->GetDistanceTo(this);
+				if (Distance < ClosestDistance)
+				{
+					ClosestDistance = Distance;
+					ClosestEnemy = HitActor;
+				}
+			}
+		}
+	}
+	return ClosestEnemy;
 }
 
 void APlayerCharacter::AddStartupAbilities()

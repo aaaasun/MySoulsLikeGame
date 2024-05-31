@@ -56,6 +56,9 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Input_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.RMB"), FString("鼠标右键"));
 
+	GameplayTags.Input_MMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.MMB"), FString("鼠标中键"));
+
 	GameplayTags.Input_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.1"), FString("键盘数字1"));
 
@@ -106,7 +109,10 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	 *Abilities
 	*/
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Abilities.Attack"), FString("攻击"));
+		FName("Abilities.Attack"), FString("攻击能力"));
+
+	GameplayTags.Abilities_LockOn = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.LockOn"), FString("锁定能力"));
 
 	/**
 	 *Montgae

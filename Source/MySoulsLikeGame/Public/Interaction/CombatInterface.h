@@ -16,6 +16,7 @@ class UCombatInterface : public UInterface
 };
 
 class UAnimMontage;
+class AEnemyCharacter;
 
 /**
  * 
@@ -39,6 +40,18 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USkeletalMeshComponent* GetCharacterMesh();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	AActor* GetClosestEnemy(float Radius, float Length);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ASLCharacterBase* GetLockOnTarget();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetLockOnTarget(ASLCharacterBase* InLockTarget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsStaring();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);

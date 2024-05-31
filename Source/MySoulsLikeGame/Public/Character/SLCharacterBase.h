@@ -7,6 +7,7 @@
 #include "AbilitySystem/Abilities/SLDamageGameplayAbility.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "UI/Widgets/SLUserWidget.h"
 #include "SLCharacterBase.generated.h"
 
 class UCombatComponent;
@@ -39,12 +40,15 @@ public:
 	virtual USkeletalMeshComponent* GetCharacterMesh_Implementation() override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatar_Implementation() override;
+	virtual ASLCharacterBase* GetLockOnTarget_Implementation() override;
+	virtual void SetLockOnTarget_Implementation(ASLCharacterBase* InLockTarget) override;
+	virtual bool IsStaring_Implementation() override;
 	/** end Combat Interface */
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TArray<FTaggedMontage> AttackMontages;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Combat")
 	bool EnableComboPeriod = true;
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -72,6 +76,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ASLBaseWeapon> DefaultRangedWeaponClass;
 
+	UPROPERTY(Replicated)
 	bool bDead = false;
 
 	UPROPERTY()
@@ -91,6 +96,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Combat")
+	TObjectPtr<ASLCharacterBase> LockTarget;
+
+	UFUNCTION()
+	void FocusOnTarget();
+
+	UFUNCTION()
+	void UnFocusTarget();
+
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 
 	virtual void InitializeDefaultAttributes() const;
@@ -101,6 +115,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(Replicated)
+	bool bIsStaring = false;
 
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ASLBaseWeapon* LastWeapon);
