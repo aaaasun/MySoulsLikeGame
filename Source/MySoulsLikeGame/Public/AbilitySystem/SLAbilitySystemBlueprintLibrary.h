@@ -52,6 +52,6 @@ public:
 	                                       const FVector& Start,
 	                                       const FVector& End);
 
-	UFUNCTION(BlueprintPure, Category="SLAbilitySystemLibrary|GameplayMechanics")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="SLAbilitySystemLibrary|GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 };

@@ -53,6 +53,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsStaring();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetbIsStaring(const bool InBool);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
 

@@ -82,6 +82,7 @@ void ASLProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
 		Destroyed();
+		Destroy();
 	}
 	else
 	{

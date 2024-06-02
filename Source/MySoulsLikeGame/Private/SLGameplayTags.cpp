@@ -71,6 +71,9 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Input_Space = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.Space"), FString("键盘空格"));
 
+	GameplayTags.Input_Shift = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Shift"), FString("键盘Shift"));
+
 	/**
 	 *Damage
 	*/
@@ -128,7 +131,7 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Montage_Attack_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Montage.Attack.LeftHand"), FString("使用左手攻击"));
-	
+
 	/**
 	 *Effect
 	*/
@@ -155,4 +158,19 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Weapon_Ranged_Bow = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Weapon.Ranged.Bow"), FString("远程武器弓"));
+
+	/**
+	*Cooldown
+	*/
+	GameplayTags.Cooldown_Fire_Archery = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.Archery"), FString("射箭冷却"));
+
+	GameplayTags.Cooldown_Attack_LightAttack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Attack.LightAttack"), FString("轻攻击冷却"));
+
+	GameplayTags.Cooldown_Roll = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Roll"), FString("翻滚冷却"));
+
+	GameplayTags.Cooldown_LockOn = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.LockOn"), FString("锁定冷却"));
 }

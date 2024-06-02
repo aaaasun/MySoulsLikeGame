@@ -37,6 +37,7 @@ public:
 	FGameplayTag Input_C;
 	FGameplayTag Input_E;
 	FGameplayTag Input_Space;
+	FGameplayTag Input_Shift;
 
 	FGameplayTag Damage;
 	FGameplayTag Damage_Physical;
@@ -63,6 +64,11 @@ public:
 
 	FGameplayTag Weapon_Melee_Sword;
 	FGameplayTag Weapon_Ranged_Bow;
+
+	FGameplayTag Cooldown_Fire_Archery;
+	FGameplayTag Cooldown_Attack_LightAttack;
+	FGameplayTag Cooldown_Roll;
+	FGameplayTag Cooldown_LockOn;
 
 private:
 	static FSLGameplayTags GameplayTags;

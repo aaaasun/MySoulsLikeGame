@@ -26,6 +26,10 @@ void USLAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<U
 			//动态能力标签（DynamicAbilityTags）：可选择复制的能力标签，这些标签也会被应用的游戏效果捕获，作为源标签。
 			AbilitySpec.DynamicAbilityTags.AddTag(SLAbility->AbilitiesInputTag);
 			GiveAbility(AbilitySpec);
+			if (SLAbility->bIsPassiveAbility)
+			{
+				TryActivateAbility(AbilitySpec.Handle);
+			}
 		}
 	}
 }

@@ -5,6 +5,7 @@
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 ASLAIController::ASLAIController()
 {
@@ -12,4 +13,11 @@ ASLAIController::ASLAIController()
 	check(Blackboard);
 	BehaviorTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>("BehaviorTreeComponent");
 	check(BehaviorTreeComponent);
+	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>("AIPerception");
+	check(AIPerception);
+}
+
+void ASLAIController::BeginPlay()
+{
+	Super::BeginPlay();
 }

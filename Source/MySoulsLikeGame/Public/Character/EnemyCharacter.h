@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/SLCharacterBase.h"
+#include "Engine/TargetPoint.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "EnemyCharacter.generated.h"
@@ -59,7 +60,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category="Combat")
 	TObjectPtr<AActor> CombatTarget;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Patrol")
+	TArray<ATargetPoint*> PatrolPoints;
+
 	UFUNCTION()
 	void SpawnDefaultWeapon();
 

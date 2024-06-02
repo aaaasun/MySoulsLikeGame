@@ -43,6 +43,7 @@ public:
 	virtual ASLCharacterBase* GetLockOnTarget_Implementation() override;
 	virtual void SetLockOnTarget_Implementation(ASLCharacterBase* InLockTarget) override;
 	virtual bool IsStaring_Implementation() override;
+	virtual void SetbIsStaring_Implementation(const bool InBool) override;
 	/** end Combat Interface */
 
 	UPROPERTY(EditAnywhere, Category="Combat")

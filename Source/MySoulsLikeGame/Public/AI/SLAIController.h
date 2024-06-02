@@ -21,6 +21,11 @@ public:
 	ASLAIController();
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY()
 	TObjectPtr<UBehaviorTreeComponent> BehaviorTreeComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAIPerceptionComponent> AIPerception;
 };

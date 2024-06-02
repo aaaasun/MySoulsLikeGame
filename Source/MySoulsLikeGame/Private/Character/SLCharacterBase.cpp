@@ -156,6 +156,11 @@ bool ASLCharacterBase::IsStaring_Implementation()
 	return bIsStaring;
 }
 
+void ASLCharacterBase::SetbIsStaring_Implementation(const bool InBool)
+{
+	bIsStaring = InBool;
+}
+
 void ASLCharacterBase::InitAbilityActorInfo()
 {
 }
@@ -164,17 +169,22 @@ void ASLCharacterBase::FocusOnTarget()
 {
 	if (IsValid(LockTarget))
 	{
-		bIsStaring = true;
-		const FVector ActorRotation = FVector(LockTarget->GetActorLocation().X, LockTarget->GetActorLocation().Y,
-		                                      LockTarget->GetActorLocation().Z - 150.f);
+		const FVector LockActorRotation = FVector(LockTarget->GetActorLocation().X, LockTarget->GetActorLocation().Y,
+		                                          LockTarget->GetActorLocation().Z - 150.f);
 		const FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(
-			GetActorLocation(), ActorRotation);
-		FRotator SmoothTargetRotation = UKismetMathLibrary::RInterpTo(GetController()->GetControlRotation(),
-		                                                              TargetRotation,
-		                                                              GetWorld()->DeltaTimeSeconds, 0.f);
-		SmoothTargetRotation = FRotator(GetController()->GetControlRotation().Pitch, SmoothTargetRotation.Yaw,
-		                                GetController()->GetControlRotation().Roll);
-		GetController()->SetControlRotation(SmoothTargetRotation);
+			GetActorLocation(), LockActorRotation);
+		FRotator SmoothControllerRotation = UKismetMathLibrary::RInterpTo(GetController()->GetControlRotation(),
+		                                                                  TargetRotation,
+		                                                                  GetWorld()->DeltaTimeSeconds, 0.f);
+		FRotator SmoothActorRotation = UKismetMathLibrary::RInterpTo(GetActorRotation(),
+		                                                             TargetRotation,
+		                                                             GetWorld()->DeltaTimeSeconds, 0.f);
+		SmoothControllerRotation = FRotator(GetController()->GetControlRotation().Pitch, SmoothControllerRotation.Yaw,
+		                                    GetController()->GetControlRotation().Roll);
+		SmoothActorRotation = FRotator(GetActorRotation().Pitch, SmoothActorRotation.Yaw, GetActorRotation().Roll);
+		SetActorRotation(SmoothActorRotation);
+		GetController()->SetControlRotation(SmoothControllerRotation);
+		bIsStaring = true;
 	}
 }
 

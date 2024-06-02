@@ -18,18 +18,18 @@
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
-	
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
-	
+
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
@@ -70,7 +70,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	}
 	if (!IsValid(LockTarget))
 	{
-			UnFocusTarget();
+		UnFocusTarget();
 	}
 }
 
@@ -85,8 +85,8 @@ AActor* APlayerCharacter::GetClosestEnemy_Implementation(float Radius, float Len
 {
 	AActor* ClosestEnemy = nullptr;
 	TArray<FHitResult> HitResults;
-	const FVector Start = GetPawnViewLocation();
-	const FVector End = Start + GetActorForwardVector() * Length;
+	const FVector Start = FollowCamera->GetComponentLocation();
+	const FVector End = Start + FollowCamera->GetForwardVector() * Length;
 	const FQuat Rot;
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
@@ -95,7 +95,6 @@ AActor* APlayerCharacter::GetClosestEnemy_Implementation(float Radius, float Len
 	Sphere.SetSphere(Radius);
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	GetWorld()->SweepMultiByObjectType(HitResults, Start, End, Rot, ObjectQueryParams, Sphere, Params);
 	if (GetWorld()->SweepMultiByObjectType(HitResults, Start, End, Rot, ObjectQueryParams, Sphere, Params))
 	{
 		float ClosestDistance = 5000.f;
