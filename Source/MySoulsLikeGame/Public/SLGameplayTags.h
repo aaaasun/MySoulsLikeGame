@@ -67,6 +67,7 @@ public:
 
 	FGameplayTag Cooldown_Fire_Archery;
 	FGameplayTag Cooldown_Attack_LightAttack;
+	FGameplayTag Cooldown_UseItem_DrinkPotion;
 	FGameplayTag Cooldown_Roll;
 	FGameplayTag Cooldown_LockOn;
 

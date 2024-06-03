@@ -21,6 +21,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
+	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
@@ -28,6 +30,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement")
+	float BaseWalkSpeed = 600.f;
+
+	UPROPERTY(BlueprintReadOnly, Category="Combat")
+	bool bHitReacting = false;
 
 	/**Combat Interaction**/
 	virtual int32 GetPlayerLevel() override;

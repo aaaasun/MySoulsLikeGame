@@ -168,6 +168,9 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Attack_LightAttack = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Attack.LightAttack"), FString("轻攻击冷却"));
 
+	GameplayTags.Cooldown_UseItem_DrinkPotion = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.UseItem.DrinkPotion"), FString("使用药水"));
+
 	GameplayTags.Cooldown_Roll = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Roll"), FString("翻滚冷却"));
 

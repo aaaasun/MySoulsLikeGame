@@ -4,6 +4,7 @@
 #include "Character/PlayerCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "CollisionDebugDrawingPublic.h"
+#include "SLGameplayTags.h"
 #include "AbilitySystem/SLAbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/SLAbilitySystemComponent.h"
 #include "Actor/SLBaseWeapon.h"
@@ -53,6 +54,13 @@ void APlayerCharacter::OnRep_PlayerState()
 
 	//为客户端初始化Ability Actor Info
 	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
