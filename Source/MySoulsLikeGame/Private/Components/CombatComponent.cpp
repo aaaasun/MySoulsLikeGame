@@ -30,6 +30,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, EquippedMeleeWeapon);
 	DOREPLIFETIME(UCombatComponent, EquippedRangedWeapon);
+	DOREPLIFETIME(UCombatComponent, ComboCode);
 }
 
 void UCombatComponent::EquipWeapon(ASLBaseWeapon* WeaponToEquip)

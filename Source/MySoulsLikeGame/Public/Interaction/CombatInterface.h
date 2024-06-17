@@ -62,6 +62,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetComboCode();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetComboCode(int32 InCode);
+
 	virtual void Die() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

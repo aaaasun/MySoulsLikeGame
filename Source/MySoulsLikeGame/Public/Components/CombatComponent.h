@@ -16,14 +16,14 @@ class MYSOULSLIKEGAME_API UCombatComponent : public UActorComponent
 
 public:
 	UCombatComponent();
-	
+
 	friend class ASLCharacterBase;
-	
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void EquipWeapon(ASLBaseWeapon* WeaponToEquip);
 
@@ -35,6 +35,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void SetRangedWeapon(ASLBaseWeapon* InWeapon);
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Combo")
+	int32 ComboCode = 0;
 
 protected:
 	virtual void BeginPlay() override;

@@ -50,6 +50,7 @@ public:
 
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_LockOn;
+	FGameplayTag Abilities_Roll;
 
 	FGameplayTag Montage_Attack_Weapon;
 	FGameplayTag Montage_Attack_Bow;
@@ -70,6 +71,8 @@ public:
 	FGameplayTag Cooldown_UseItem_DrinkPotion;
 	FGameplayTag Cooldown_Roll;
 	FGameplayTag Cooldown_LockOn;
+
+	FGameplayTag Combo_LightAttack;
 
 private:
 	static FSLGameplayTags GameplayTags;

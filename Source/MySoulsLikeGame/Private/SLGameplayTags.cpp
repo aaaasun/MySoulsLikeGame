@@ -117,6 +117,9 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_LockOn = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.LockOn"), FString("锁定能力"));
 
+	GameplayTags.Abilities_Roll= UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Roll"), FString("翻滚能力"));
+
 	/**
 	 *Montgae
 	*/
@@ -176,4 +179,10 @@ void FSLGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Cooldown_LockOn = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.LockOn"), FString("锁定冷却"));
+
+	/**
+	*Combo
+	*/
+	GameplayTags.Combo_LightAttack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Combo.LightAttack"), FString("轻攻击连招"));
 }

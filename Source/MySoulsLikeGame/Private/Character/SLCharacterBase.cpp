@@ -161,6 +161,16 @@ void ASLCharacterBase::SetbIsStaring_Implementation(const bool InBool)
 	bIsStaring = InBool;
 }
 
+int32 ASLCharacterBase::GetComboCode_Implementation()
+{
+	return CombatComponent->ComboCode;
+}
+
+void ASLCharacterBase::SetComboCode_Implementation(int32 InCode)
+{
+	CombatComponent->ComboCode = InCode;
+}
+
 void ASLCharacterBase::InitAbilityActorInfo()
 {
 }
@@ -182,7 +192,10 @@ void ASLCharacterBase::FocusOnTarget()
 		SmoothControllerRotation = FRotator(GetController()->GetControlRotation().Pitch, SmoothControllerRotation.Yaw,
 		                                    GetController()->GetControlRotation().Roll);
 		SmoothActorRotation = FRotator(GetActorRotation().Pitch, SmoothActorRotation.Yaw, GetActorRotation().Roll);
-		SetActorRotation(SmoothActorRotation);
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(FSLGameplayTags::Get().Abilities_Roll))
+		{
+			SetActorRotation(SmoothActorRotation);
+		}
 		GetController()->SetControlRotation(SmoothControllerRotation);
 		bIsStaring = true;
 	}
@@ -190,9 +203,9 @@ void ASLCharacterBase::FocusOnTarget()
 
 void ASLCharacterBase::UnFocusTarget()
 {
+	bIsStaring = false;
 	if (!IsValid(LockTarget))
 	{
-		bIsStaring = false;
 	}
 }
 
